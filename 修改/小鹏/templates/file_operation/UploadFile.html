@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>上传文件</title>
+    <link rel="shortcut icon" href="{% static 'images\favicon_Upload.ico' %}" type="image/x-icon"/>
+</head>
+<script src="{% static "js\jquery-3.6.0.min.js" %}"></script>
+<script src="{% static "js\jquery.cookie.js" %}"></script>
+<script src="{% static "plugins\layui\layui.js" %}"></script>
+<link rel="stylesheet" href="{% static "plugins\layui\css\layui.css" %}">
+<style type="text/css">
+    .layui-body {
+        position: absolute;
+    }
+
+    .layui-btn-lg{
+        height: 80px;
+        font-size: 32px;
+        margin: 10px;
+    }
+
+    .ShowNav {
+        font-size: 16px;
+        position: absolute;
+    }
+
+    .dropbox{
+        min-width:300px;
+        min-height:300px;
+        border:5px dashed black;
+        margin:10px;
+        background: #66CCFF;
+    }
+
+    .CenterText{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+<body>
+<div>
+    <a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+       onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">点击还原导航栏</a>
+</div>
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+                <dd><a href="/TableChoose/">数据表选择</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="">数据表</a></dd>
+                <dd><a href="">柱状图</a></dd>
+                <dd><a href="">折线图</a></dd>
+                <dd><a href="">散点图</a></dd>
+                <dd><a href="">饼图</a></dd>
+                <dd><a href="">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <input style="display: none" type="file" id="HandFile" multiple="multiple" accept=".csv,.xlxs">
+    <div class="dropbox" name="image" id="dropbox" style="">
+        <div id="UploadText" style="text-align: center">
+            <b id="showText" style="font-size:50px;">
+                拖文件到此或单击此处准备上传文件(支持csv/xlxs文件)<br>支持多文件上传，但只会上传格式正确的文件格式
+            </b>
+        </div>
+        <div class="CenterText" style="display: none">
+            <label id="UploadingText" style="font-size:50px;">上&emsp;传&emsp;中&emsp;:</label>
+            <div class="layui-progress layui-progress-big" lay-showPercent="true">
+            <div class="layui-progress-bar layui-bg-green" lay-percent=""></div>
+        </div>
+        </div>
+    </div>
+    <div>
+        <button id="UploadBtn" type="button" class="layui-btn layui-btn-lg layui-btn-normal layui-btn-disabled">开始上传</button>
+        <button id="UploadCancel" type="button" class="layui-btn layui-btn-lg layui-btn-warm">取消</button>
+    </div>
+</div>
+
+<script>
+
+    window.onload = function(e){
+        changeTextSize()
+    }
+
+    layui.use(['layer', 'laydate','element'], function () {
+        var layer = layui.layer
+        var laydate = layui.laydate
+        var element = layui.element
+        laydate.render({
+            elem: '#ChooseTime',
+            min: '2012-05-01',
+            max: '2012-10-30',
+            showBottom: false,
+            done: function (date) {
+                {# data为选择的日期 #}
+            }
+        })
+
+    })
+
+    var dropbox = document.getElementById('dropbox')
+    var showText = document.getElementById('showText')
+    var UploadBtn = document.getElementById('UploadBtn')
+    var HandFile = document.getElementById('HandFile')
+
+    //单击上传
+    dropbox.onclick = function(e){
+        e.preventDefault()
+        e.stopPropagation()
+        HandFile.click()
+        const GetFiles = HandFile.files
+        console.log(GetFiles)
+        {#showText.innerText = '当前上传的文件有:'#}
+        {#for(let i = 0;i < GetFiles.length;i++){#}
+        {#    showText.innerText += GetFiles[i].name.split('.')[0] + ',';#}
+        {# }#}
+        {#console.log(showText.innerText.length)#}
+        {#if(showText.innerText.length > 90){#}
+        {#    showText.innerText = showText.innerText.substring(0, 90) + '....'#}
+        {# }#}
+        {#showText.innerText += '\n单击上传按钮开始上传'#}
+        {#changeTextSize()#}
+        {#UploadBtn.className = 'layui-btn layui-btn-lg layui-btn-normal'#}
+    }
+
+    // 拖拽上传
+    dropbox.ondragenter = function (e) {
+        e.preventDefault()
+        UploadBtn.className = 'layui-btn layui-btn-lg layui-btn-normal layui-btn-disabled'
+        dropbox.style.borderColor = 'rgba(0,0,0,0.3)'
+        dropbox.style.background = 'rgba(102,204,255,0.5)'
+        showText.style.color = 'rgba(0,0,0,0.3)'
+        showText.innerText = '松开鼠标准备上传'
+    }
+
+    dropbox.ondragover = function(e){
+        e.preventDefault()
+    }
+
+    dropbox.ondragleave = function (e) {
+        e.preventDefault()
+        UploadBtn.className = 'layui-btn layui-btn-lg layui-btn-normal layui-btn-disabled'
+        dropbox.style.borderColor = 'rgba(0,0,0,1)'
+        dropbox.style.background = 'rgba(102,204,255,1)'
+        showText.style.color = 'rgba(0,0,0,1)'
+        showText.innerText = '拖文件到此或单击此处准备上传文件'
+        changeTextSize()
+    }
+
+    dropbox.ondrop = function (e) {
+        e.stopPropagation()
+        e.preventDefault()
+        dropbox.style.borderColor = 'rgba(0,0,0,1)'
+        dropbox.style.background = 'rgba(102,204,255,1)'
+        showText.style.color = 'rgba(0,0,0,1)'
+        const GetFiles = e.dataTransfer.files
+        showText.innerText = '当前上传的文件有:'
+        for(let i = 0;i < GetFiles.length;i++){
+            showText.innerText += GetFiles[i].name.split('.')[0] + ',';
+        }
+        console.log(showText.innerText.length)
+        if(showText.innerText.length > 90){
+            showText.innerText = showText.innerText.substring(0, 90) + '....'
+        }
+        showText.innerText += '\n单击上传按钮开始上传'
+        changeTextSize()
+        UploadBtn.className = 'layui-btn layui-btn-lg layui-btn-normal'
+        console.log(e.dataTransfer.files)
+    }
+
+    //改变文本位置
+    function changeTextSize() {
+        var uploadtext = document.getElementById('UploadText')
+        var margintop = (285 - uploadtext.offsetHeight) / 2 + 'px'
+        uploadtext.style.marginTop = margintop
+    }
+
+    //
+    HandFile.onselectionchange = function (e) {
+            console.log("哈哈")
+    }
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析-数据表</title>
+    <link rel="Shortcut Icon" href="/statics/images/favicon_DataSheet.ico">
+    <link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+</head>
+<style type="text/css">
+    .layui-form-item {
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
+
+    .layui-form-label {
+        font-weight: bold;
+        font-size: 16px;
+        width: auto;
+        text-align: left;
+        margin:5px;
+    }
+
+    .layui-body {
+        position: absolute;
+    }
+
+    .ShowNav {
+        font-size: 16px;
+        font-weight: bold;
+        margin-left: 6px;
+        position: absolute;
+    }
+
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        border-bottom: 2px solid black;
+        border-top: 1px solid black;
+        font-size: 20px;
+    }
+</style>
+<body>
+{# 还原导航栏 #}
+<a style="z-index: 9999" id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+   onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">
+    点击还原导航栏
+</a>
+
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="">柱状图</a></dd>
+                <dd><a href="">折线图</a></dd>
+                <dd><a href="">散点图</a></dd>
+                <dd><a href="">饼图</a></dd>
+                <dd><a href="">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <table id="DataSheet" lay-filter="DataSheet"></table>
+    <div id="page"></div>
+</div>
+</body>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/js/div/DataSheet.js"></script>
+</html>

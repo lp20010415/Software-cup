@@ -16,10 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from pythonFiles import html
+from DataAction import Action
 
 urlpatterns = [
-    path('UploadFile/', html.UploadFile),
-    path('TableChoose/', html.DataBaseChoose),
-    path('index/', html.index),
     path('admin/', admin.site.urls),
+    path('UploadFile/', html.UploadFile),
+    path('DataSheet/', html.DataSheet),
+    path('BarCharts/', html.BarCharts),
+    path('index/', html.index),
+    path('test/', html.GetData),
+    path('GetData/', Action.getData),
+    path('Upload/', Action.UploadFile),
+    path('haha/', Action.haha),
+    path('drawTable/', Action.drawTable),
 ]

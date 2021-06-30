@@ -16,7 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -77,16 +76,16 @@ WSGI_APPLICATION = 'match.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # # 数据库
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'match_data',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': '1.117.74.238',
-#         'PORT': '5432',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'match_data',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': '1.117.74.238',
+        'PORT': '5432',
+    }
+}
 
 
 # Password validation
@@ -125,10 +124,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "statics"),
+#
+# ]
+STATIC_URL = '/statics/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "statics"),
-
+    os.path.join(BASE_DIR, 'statics/')
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

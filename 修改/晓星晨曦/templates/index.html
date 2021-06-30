@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析</title>
+</head>
+<link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+<style type="text/css">
+    .layui-form-item {
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
+
+    .layui-form-label {
+        font-weight: bold;
+        font-size: 16px;
+        width: auto;
+        text-align: left;
+        margin:5px;
+    }
+
+    .MainItem {
+        top: 0;
+        border: 2px solid black;
+        width: auto;
+        height: auto;
+        margin-top: 1px;
+        margin-left: 2px;
+        text-align: center;
+    }
+
+    .ChooseItem {
+        display: inline-block;
+        border: 2px solid black;
+        font-weight: bold;
+    }
+
+    .layui-body {
+        position: absolute;
+    }
+
+    .ShowNav {
+        font-size: 18px;
+        font-weight: bold;
+        margin-left: 6px;
+        position: absolute;
+    }
+
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        border-bottom: 2px solid black;
+        border-top: 1px solid black;
+        font-size: 20px;
+    }
+</style>
+<body>
+{# 还原导航栏 #}
+<a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+   onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">
+    点击还原导航栏
+</a>
+
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="/BarCharts/">柱状图</a></dd>
+                <dd><a href="/LineCharts/">折线图</a></dd>
+                <dd><a href="/ScatterCharts/">散点图</a></dd>
+                <dd><a href="/PieCharts/">饼图</a></dd>
+                <dd><a href="/AreaCharts/">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <fieldset style="text-align: center;border-bottom: none;font-size: 20px;">
+        <legend><b>每次有60条数据</b></legend>
+    </fieldset>
+    <div class="MainItem">
+        <fieldset>
+            <legend style="font-size: 16px;"><b>X轴、Y轴、显示数据选择(<a style="text-decoration: underline;color:red">三者说明</a>)</b></legend>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;">10或20条</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">X轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="X_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <input class="layui-input" type="text" id="day_id">
+                        <select id="X_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;">默认全选</legend>
+            <div class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Y轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="Y_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Y_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;">默认全选</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">显示数据:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="DataS_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Data_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+</body>
+<script src="/statics/plugins/Echarts/echarts.common.js"></script>
+<script src="/statics/js/EchartsStyle.js"></script>
+<script src="/statics/js/jquery-3.6.0.min.js"></script>
+<script src="/statics/js/jquery.cookie.js"></script>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/plugins/layui/xm-select.js"></script>
+<script type="text/javascript">
+
+    var xmSelect = layui.xmSelect //使用xm-select
+    var GetX_Data, GetX_ChooseItem, GetX_ParentValue
+    var GetY_ChooseItem
+    var GetDataS_ChooseItem
+    
+    window.onload = function(e){
+        $.ajax({
+            url: '/statics/data/X_Location.json',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                GetX_Data = data['data']
+                X_Location.update({
+                    data: data['data']
+                })
+            },
+            error: function (data) {
+                alert("出错了,原因:" + data)
+            }
+        })
+    }
+
+    layui.use(['layer', 'laydate', 'form','xmSelect'], function () {
+        var layer = layui.layer
+        var laydate = layui.laydate
+        var form = layui.form
+
+        laydate.render({
+            elem: '#day_id',
+            min: '2012-05-01',
+            max: '2012-10-30',
+            showBottom: false,
+            done: function (date) {
+                {# data为选择的日期 #}
+            }
+        })
+
+    })
+
+    var X_Location = xmSelect.render({
+        el: '#X_Location',
+        height: '200px',
+        filterable: true,
+        iconfont:{
+            parent: 'hidden'
+        },
+        tree: {
+            show: true,
+            showFolderIcon: true,
+            showLine: true,
+            indent: 20,
+            strict: true,
+            //simple: true,
+        },
+        toolbar:{
+            show: true,
+            list: ['CLEAR']
+        },
+        style:{
+            width: '250px',
+            margin: '5px'
+        },
+        data: [],
+        on(data){
+            var arr = data.arr
+            var isAdd = data.isAdd
+            var change = data.change
+
+            //设置禁用
+            if(isAdd && arr.length != 0){
+                var currData = change.slice(0, 1)
+                var getParentValue = currData[0].__node.parent.value
+
+                //获取所选项和父级的value
+                GetX_ChooseItem = arr
+                GetX_ParentValue = getParentValue
+                setTimeout(ChangeDisabled(getParentValue), '1')  //设置禁用事件
+            }else if(arr.length == 0){
+                GetX_ChooseItem = ""
+                GetX_ParentValue = ""
+                setTimeout(ChangeDisabled(0), '1')  //设置禁用事件
+            }
+        }
+    })
+
+    var Y_Location = xmSelect.render({
+        el: '#Y_Location',
+        filterable: true,
+        "style":{
+            "width": "250px",
+            "margin": "5px",
+        },
+        toolbar:{
+          show: true,
+        },
+        data:[
+            {name: '航段距离 ', value: 1},
+            {name: '航节主舱位运力量', value: 2},
+            {name: '旅客量', value: 3},
+            {name: '主舱位是F和C的旅客量', value: 4},
+            {name: '团队旅客量', value: 5},
+            {name: '常旅客量', value: 6},
+            {name: '每旅客分摊收入', value: 7},
+            {name: 'Y舱基准价', value: 8},
+            {name: '座公里', value: 9},
+            {name: '客公里', value: 10},
+            {name: '客座率', value: 11},
+        ],
+        on: function (data) {
+            var arr = data.arr
+            var isAdd = data.isAdd
+
+            if(isAdd && arr.length != 0){
+                GetY_ChooseItem = arr
+            }else{
+                GetY_ChooseItem = 0
+            }
+        }
+    })
+
+    var DataS_Location = xmSelect.render({
+        el: '#DataS_Location',
+        filterable: true,
+        "style":{
+            "width": "250px",
+            "margin": "5px",
+        },
+        toolbar:{
+          show: true,
+        },
+        data: [
+            {name: '承运日期', value: 'day_id'},
+            {name: '到达日期', value: 'flt_seg_arrv_dt'},
+            {name: '航空公司', value: 'carr_cd'},
+            {name: '航班号', value: 'flt_nbr'},
+            {name: '航班航线', value: 'flt_rte_cd'},
+            {name: '航班序号', value: 'flt_seg_seq_nbr'},
+            {name: '机型', value: 'aircrft_typ'},
+            {name: '出发城市-到达城市', value: 1},
+            {name: '出发机场-到达机场', value: 2},
+        ],
+        on: function (data) {
+            var arr = data.arr
+            var isAdd = data.isAdd
+
+            if(isAdd && arr.length != 0){
+                GetDataS_ChooseItem = arr
+            }else {
+                GetDataS_ChooseItem = 0
+            }
+
+        }
+    })
+
+    //设置禁用
+    function ChangeDisabled(value){
+        if(value != "0"){
+            GetX_Data.forEach(item=>{
+                if(item.value != value){
+                    X_Location.disable([item.value])
+                }
+            })
+        }else{
+            GetX_Data.forEach(item=>{
+                X_Location.enable([item.value])
+            })
+        }
+    }
+
+</script>
+</html>

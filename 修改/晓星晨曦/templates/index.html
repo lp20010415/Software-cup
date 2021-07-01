@@ -94,10 +94,10 @@
     </fieldset>
     <div class="MainItem">
         <fieldset>
-            <legend style="font-size: 16px;"><b>X轴、Y轴、显示数据选择(<a style="text-decoration: underline;color:red">三者说明</a>)</b></legend>
+            <legend style="font-size: 16px;"><b>X轴、Y轴、显示数据选择{#<a style="text-decoration: underline;color:red">三者说明</a>#}</b></legend>
         </fieldset>
         <fieldset class="ChooseItem">
-            <legend style="font-size: 12px;">10或20条</legend>
+            <legend style="font-size: 12px;" id="XText">10或20项(已项0项)</legend>
             <div class="layui-form">
                 <div class="layui-form-item">
                     <label class="layui-form-label">X轴:</label>
@@ -112,7 +112,7 @@
             </div>
         </fieldset>
         <fieldset class="ChooseItem">
-            <legend style="font-size: 12px;">默认全选</legend>
+            <legend style="font-size: 12px;" id="YText">默认全选</legend>
             <div class="layui-form ">
                 <div class="layui-form-item">
                     <label class="layui-form-label">Y轴:</label>
@@ -125,19 +125,11 @@
                 </div>
             </div>
         </fieldset>
-        <fieldset class="ChooseItem">
-            <legend style="font-size: 12px;">默认全选</legend>
-            <div class="layui-form">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">显示数据:</label>
-                    <div class="layui-inline" style="text-align: start">
-                        <div id="DataS_Location"></div>
-                    </div>
-                    <div class="layui-inline layui-hide">
-                        <select id="Data_SelectItem"></select>
-                    </div>
-                </div>
-            </div>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="drawCharts_GetData()">确定</button>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="cancel()">取消</button>
         </fieldset>
     </div>
 </div>
@@ -152,9 +144,9 @@
 
     var xmSelect = layui.xmSelect //使用xm-select
     var GetX_Data, GetX_ChooseItem, GetX_ParentValue
-    var GetY_ChooseItem
-    var GetDataS_ChooseItem
-    
+    var GetY_ChooseItem = ""
+    var GetResponseData = ""
+
     window.onload = function(e){
         $.ajax({
             url: '/statics/data/X_Location.json',
@@ -172,23 +164,6 @@
         })
     }
 
-    layui.use(['layer', 'laydate', 'form','xmSelect'], function () {
-        var layer = layui.layer
-        var laydate = layui.laydate
-        var form = layui.form
-
-        laydate.render({
-            elem: '#day_id',
-            min: '2012-05-01',
-            max: '2012-10-30',
-            showBottom: false,
-            done: function (date) {
-                {# data为选择的日期 #}
-            }
-        })
-
-    })
-
     var X_Location = xmSelect.render({
         el: '#X_Location',
         height: '200px',
@@ -202,7 +177,7 @@
             showLine: true,
             indent: 20,
             strict: true,
-            //simple: true,
+            simple: true,
         },
         toolbar:{
             show: true,
@@ -217,20 +192,26 @@
             var arr = data.arr
             var isAdd = data.isAdd
             var change = data.change
-
+            if(change)
+                setTimeout(ChangeXShowText(arr.length), 1)
             //设置禁用
             if(isAdd && arr.length != 0){
                 var currData = change.slice(0, 1)
-                var getParentValue = currData[0].__node.parent.value
+                var getParentValue
+                try{
+                    getParentValue = currData[0].__node.parent.__node.parent.value
+                }catch (e) {
+                    getParentValue = currData[0].__node.parent.value
+                }
 
                 //获取所选项和父级的value
                 GetX_ChooseItem = arr
                 GetX_ParentValue = getParentValue
-                setTimeout(ChangeDisabled(getParentValue), '1')  //设置禁用事件
+                setTimeout(ChangeDisabled(getParentValue), 1)  //设置禁用事件
             }else if(arr.length == 0){
                 GetX_ChooseItem = ""
                 GetX_ParentValue = ""
-                setTimeout(ChangeDisabled(0), '1')  //设置禁用事件
+                setTimeout(ChangeDisabled(0), 1)  //设置禁用事件
             }
         }
     })
@@ -246,61 +227,31 @@
           show: true,
         },
         data:[
-            {name: '航段距离 ', value: 1},
-            {name: '航节主舱位运力量', value: 2},
-            {name: '旅客量', value: 3},
-            {name: '主舱位是F和C的旅客量', value: 4},
-            {name: '团队旅客量', value: 5},
-            {name: '常旅客量', value: 6},
-            {name: '每旅客分摊收入', value: 7},
-            {name: 'Y舱基准价', value: 8},
-            {name: '座公里', value: 9},
-            {name: '客公里', value: 10},
-            {name: '客座率', value: 11},
+            {name: '航段距离 ', value: 17},
+            {name: '航节主舱位运力量', value: 19},
+            {name: '旅客量', value: 20},
+            {name: '主舱位是F和C的旅客量', value: 21},
+            {name: '团队旅客量', value: 22},
+            {name: '常旅客量', value: 23},
+            {name: '每旅客分摊收入', value: 24},
+            {name: 'Y舱基准价', value: 25},
+            {name: '座公里', value: 9},    //航节主舱位运力量 * 航段距离 var seat_kil = GetResponseData[][19] * GetResponseData[][17]
+            {name: '客公里', value: 10},   //旅客量 * 航段距离 var guess_kil = GetResponseData[][20] * GetResponseData[][17]
+            {name: '客座率', value: 11},   //(客公里 / 座公里) var plf = seat_kil / guess_kil
         ],
         on: function (data) {
             var arr = data.arr
             var isAdd = data.isAdd
+            var change = data.change
+
+            if(change)
+                setTimeout(ChangeYShowText(arr.length), 1)
 
             if(isAdd && arr.length != 0){
                 GetY_ChooseItem = arr
             }else{
                 GetY_ChooseItem = 0
             }
-        }
-    })
-
-    var DataS_Location = xmSelect.render({
-        el: '#DataS_Location',
-        filterable: true,
-        "style":{
-            "width": "250px",
-            "margin": "5px",
-        },
-        toolbar:{
-          show: true,
-        },
-        data: [
-            {name: '承运日期', value: 'day_id'},
-            {name: '到达日期', value: 'flt_seg_arrv_dt'},
-            {name: '航空公司', value: 'carr_cd'},
-            {name: '航班号', value: 'flt_nbr'},
-            {name: '航班航线', value: 'flt_rte_cd'},
-            {name: '航班序号', value: 'flt_seg_seq_nbr'},
-            {name: '机型', value: 'aircrft_typ'},
-            {name: '出发城市-到达城市', value: 1},
-            {name: '出发机场-到达机场', value: 2},
-        ],
-        on: function (data) {
-            var arr = data.arr
-            var isAdd = data.isAdd
-
-            if(isAdd && arr.length != 0){
-                GetDataS_ChooseItem = arr
-            }else {
-                GetDataS_ChooseItem = 0
-            }
-
         }
     })
 
@@ -313,10 +264,97 @@
                 }
             })
         }else{
+            {#GetX_Data.forEach(item=>{ #}//现存BUG
+            {#    X_Location.enable([item.value])#}
+            {# })#}
             GetX_Data.forEach(item=>{
-                X_Location.enable([item.value])
+                item.disabled = false
+                item.children.forEach(item2=>{
+                    item2.disabled = false
+                    if(item2.children){
+                        item2.children.forEach(item3=>{
+                            item3.disabled = false
+                        })
+                    }
+                })
+            })
+            X_Location.update({data: GetX_Data})
+        }
+    }
+
+    //画图表
+    function drawCharts_Draw(){
+        if(GetY_ChooseItem.length == 0){//Y轴未选
+
+        }else {
+            
+        }
+    }
+
+    //画图表-获取数据
+    function drawCharts_GetData() {
+        var GetX_Length = X_Location.getValue().length
+        var GetX_Data = X_Location.getValue()
+        var PostData = []
+        if(GetX_Length == 10 || GetX_Length == 20){
+            for(let i = 0;i < GetX_Length;i++){
+                PostData.push(GetX_Data[i].name)
+            }
+            var fromData = new FormData();
+            fromData.append('Xvalue', GetX_ParentValue)
+            fromData.append('Xdata', PostData)
+            //获取数据
+            $.ajax({
+                url: "/drawCharts/",
+                headers: {"X-CSRFtoken": $.cookie("csrftoken")},
+                data: fromData,
+                type: "Post",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    console.log(result)
+                    GetResponseData = result
+                    drawCharts_Draw()
+                },error: function () {
+                    layer.open({
+                        title: '提示',
+                        content: '出错了啦！请联系工作人员，嘿嘿'
+                    })
+                }
+            })
+
+        }else {
+            layer.open({
+                'title': '提示',
+                'content': 'X轴只能选10或20项！'
             })
         }
+    }
+
+
+    //改变X轴所选个数文字显示
+    function ChangeXShowText(num){
+        var XText = document.getElementById('XText')
+        XText.innerText = "10或20项(已选" + num + "项)"
+    }
+
+    //改变Y轴所选个数文字显示
+    function ChangeYShowText(num) {
+        var YText = document.getElementById('YText')
+        if(num == 0)
+            YText.innerText = "默认全选"
+        else
+            YText.innerText = "默认全选(已选" + num + "项)"
+    }
+
+    //清空所选
+    function cancel() {
+        document.getElementById('XText').innerText = "10或20项(已选0项)"
+        document.getElementById('YText').innerText = "默认全选"
+        X_Location.setValue([ ])
+        Y_Location.setValue([ ])
+        ChangeDisabled(0)
     }
 
 </script>

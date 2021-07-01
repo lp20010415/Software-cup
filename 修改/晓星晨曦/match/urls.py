@@ -26,7 +26,8 @@ urlpatterns = [
     path('index/', html.index),
     path('test/', html.GetData),
     path('GetData/', Action.getData),
-    path('Upload/', Action.UploadFile),
-    path('haha/', Action.haha),
+    path('UploadFile/', Action.UploadFile),
     path('drawTable/', Action.drawTable),
+    path('drawCharts/', Action.drawCharts),
+    path('haha/', Action.haha),
 ]

@@ -21,11 +21,22 @@
         margin:5px;
     }
 
+    .layui-form-select .layui-input{
+        width: 170px;
+        text-align: right;
+        padding: 0 10px;
+    }
+
+    .layui-select-title .layui-edge{
+        display: none;
+    }
+
     .layui-body {
         position: absolute;
     }
 
     .ShowNav {
+        top: 0;
         font-size: 16px;
         font-weight: bold;
         margin-left: 6px;
@@ -64,20 +75,61 @@
             <a href="javascript:">图表展现</a>
             <dl class="layui-nav-child">
                 <dd><a href="/DataSheet/">数据表</a></dd>
-                <dd><a href="">柱状图</a></dd>
-                <dd><a href="">折线图</a></dd>
-                <dd><a href="">散点图</a></dd>
-                <dd><a href="">饼图</a></dd>
-                <dd><a href="">面积图</a></dd>
+                <dd><a href="/BarCharts/">柱状图</a></dd>
+                <dd><a href="/LineCharts/">折线图</a></dd>
+                <dd><a href="/ScatterCharts/">散点图</a></dd>
+                <dd><a href="/PieCharts/">饼图</a></dd>
+                <dd><a href="/AreaCharts/">面积图</a></dd>
             </dl>
         </div>
     </div>
 </div>
-<div class="layui-body" id="WorkBody">
+<div class="layui-body" id="WorkBody" style="margin-top:10px">
+    <div class="layui-inline">
+        <div class="layui-form" style="margin-left: 10px">
+            <select lay-filter="searchSelect">
+                <option></option>
+                <option value="day_id">承运日期:</option>
+                <option value="dpt_cty_cd">出发城市:</option>
+                <option value="arrv_cty_cd">到达城市:</option>
+                <option value="dpt_airpt_cd">出发机场:</option>
+                <option value="arrv_airpt_cd">到达机场:</option>
+                <option value="carr_cd">航空公司:</option>
+                <option value="flt_nbr">航班号:</option>
+                <option value="cls_cd">主舱位:</option>
+                <option value="sub_cls_cd">子舱位:</option>
+                <option value="flt_rte_cd">航班航线:</option>
+                <option value="flt_seg_dpt_hh">航段起飞小时:</option>
+                <option value="flt_seg_dpt_mm">航段起飞分钟:</option>
+                <option value="flt_seg_arrv_dt">到达日期:</option>
+                <option value="flt_seg_arrv_hh">航段到达小时:</option>
+                <option value="flt_seg_arrv_mm">航段到达分钟:</option>
+                <option value="flt_seg_seq_nbr">航段序号:</option>
+                <option value="aircrft_typ">机型:</option>
+                <option value="flt_seg_dstnc">航段距离:</option>
+                <option value="leg_qty">航节数:</option>
+                <option value="cls_cpc_qty">航节主舱位运力量:</option>
+                <option value="pax_qty">旅客量:</option>
+                <option value="fc_pax_qty">主舱位是F和C的旅客量:</option>
+                <option value="grp_pax_qty">团队旅客量:</option>
+                <option value="ffp_pax_qty">常旅客量:</option>
+                <option value="net_amt">每旅客分摊收入:</option>
+                <option value="y_fr_amt">Y舱基准价:</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <input class="layui-input" id="searchInput" autocomplete="off">
+    </div>
+    <button class="layui-btn" onclick="search()">搜索</button>
     <table id="DataSheet" lay-filter="DataSheet"></table>
     <div id="page"></div>
 </div>
 </body>
 <script src="/statics/plugins/layui/layui.js"></script>
 <script src="/statics/js/div/DataSheet.js"></script>
+<script>
+
+</script>
 </html>

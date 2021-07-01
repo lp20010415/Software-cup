@@ -118,7 +118,7 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
         }
         console.log(formFile.get('file'))
         $.ajax({
-            url: "/Upload/",
+            url: "/UploadFile/",
             headers: {"X-CSRFtoken": $.cookie("csrftoken")},
             data: formFile,
             type: "Post",

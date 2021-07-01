@@ -4,6 +4,7 @@ import datetime
 import json
 import os
 import random
+import re
 
 import xlrd
 from django.db import connection
@@ -128,11 +129,27 @@ def drawTable(request):
         page = request.GET.get('page')
         field = request.GET.get('field')
         data = []
-        if order != "":
+        if order == "desc" or order == "asc":
             cursor.execute(f'insert into temporary_table select * from milion_data limit 100 offset {(int(page) - 1) * 100}')
             cursor.execute(f'select * from temporary_table order by {field} {order}')
             row = cursor.fetchall()
             data = simplify(row)
+        elif re.match('search', order):
+            if re.match('desc|asc', order.split('-')[-1]):
+                print('来了')
+                order = order.split('-')[-1]
+                print(order)
+                cursor.execute(f'select * from temporary_search_table order by {field} {order}')
+                row = cursor.fetchall()
+                data = simplify(row)
+            else:
+                content = request.GET.get('content')
+                cursor.execute('drop table temporary_search_table')
+                cursor.execute('create table temporary_search_table (like milion_data)')
+                cursor.execute(f"insert into temporary_search_table select * from temporary_table where {field} like '%{content}%'")
+                cursor.execute(f"select * from temporary_table where {field} like '%{content}%'")
+                row = cursor.fetchall()
+                data = simplify(row)
         else:
             cursor.execute(f'select * from milion_data limit 100 offset {(int(page) - 1) * 100}')
             row = cursor.fetchall()
@@ -144,6 +161,67 @@ def drawTable(request):
             "data": data
         }
         return HttpResponse(json.dumps(giveBack, ensure_ascii=False), content_type='application/json')
+
+
+# 画图表
+def drawCharts(request):
+    Alldata = []
+    Getdata = []
+    if request.method == "POST":
+        cursor = connection.cursor()
+        post = request.POST
+        Xvalue = post.get('Xvalue')
+        Xdata = post.get('Xdata').split(',')
+        print(f'Xvalue:{Xvalue}---Xdata:{Xdata}')
+        if len(Xdata) == 10:
+            for i, value in enumerate(Xdata):
+                cursor.execute(f"select * from sample_1k_flts where {Xvalue} = '{value}' limit 6 offset {i * 6}")
+                row = cursor.fetchall()
+                for j in range(len(row)):
+                    Getdata.append(list(row[j]))
+            for i, v1 in enumerate(Getdata):
+                print(v1)
+                for j, v2 in enumerate(v1):
+                    if v2 is None:
+                        Getdata[i][j] = "0"
+            for i in range(0, len(Getdata), 6):
+                a = []
+                a.append(Getdata[i])
+                a.append(Getdata[i + 1])
+                a.append(Getdata[i + 2])
+                a.append(Getdata[i + 3])
+                a.append(Getdata[i + 4])
+                a.append(Getdata[i + 5])
+                b = {
+                    "name": Getdata[i][0],
+                    "data": a
+                }
+                Alldata.append(b)
+        elif len(Xdata) == 20:
+            for i, value in enumerate(Xdata):
+                cursor.execute(f"select * from sample_1k_flts where {Xvalue} = '{value}' limit 3 offset {i * 3}")
+                row = cursor.fetchall()
+                for j in range(len(row)):
+                    Getdata.append(list(row[j]))
+            for i, v1 in enumerate(Getdata):
+                print(v1)
+                for j, v2 in enumerate(v1):
+                    if v2 is None:
+                        Getdata[i][j] = "0"
+            for i in range(0, len(Getdata), 6):
+                a = []
+                a.append(Getdata[i])
+                a.append(Getdata[i + 1])
+                a.append(Getdata[i + 2])
+                a.append(Getdata[i + 3])
+                a.append(Getdata[i + 4])
+                a.append(Getdata[i + 5])
+                b = {
+                    "name": Getdata[i][0],
+                    "data": a
+                }
+                Alldata.append(b)
+    return HttpResponse(json.dumps(Alldata, ensure_ascii=False), content_type='application/json')
 
 
 # 简化代码量

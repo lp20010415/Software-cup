@@ -1,8 +1,10 @@
 document.write("<script language='JavaScript' src='/statics/js/jquery-3.6.0.min.js/'></script>")
 document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'></script>")
-    var getTotal
+    var getTotal, getSearchSelect
     var table = layui.table
     var laypage = layui.laypage
+    var form = layui.form
+    var checkSearch = false
 
     //窗口加载事件
     window.onload = function(){
@@ -45,7 +47,7 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
             elem: '#DataSheet',
             sortType: 'server',
             autoSort: false,
-            height: 'full-' + document.getElementById('page').offsetHeight,
+            height: 'full-' + (document.getElementById('page').offsetHeight + document.getElementById('searchInput').offsetHeight + 10),
             cellMinWidth: 110,
             cols: [[
                 {field:'day_id', title:'承运日期', sort:true},
@@ -81,12 +83,63 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
     }
 
     table.on('sort(DataSheet)', function (obj) {
-        table.reload('DataSheet', {
-            initSort: obj,
-            url: '/drawTable/',
-            where: {
-                field: obj.field,
-                order: obj.type,
-            }
-        })
+        console.log(obj)
+        var content = document.getElementById('searchInput').value
+        if(content == "" && getSearchSelect == ""){
+            checkSearch = false
+        }
+        if(!checkSearch){
+            table.reload('DataSheet', {
+                initSort: obj,
+                url: '/drawTable/',
+                where: {
+                    field: obj.field,
+                    order: obj.type,
+                }
+            })
+        }else{
+            table.reload('DataSheet', {
+                initSort: obj,
+                url: '/drawTable/',
+                where: {
+                    field: obj.field,
+                    order: 'search-' + obj.type,
+                }
+            })
+        }
     })
+
+    //搜索功能相关
+    form.on('select(searchSelect)', function(data){
+        getSearchSelect = data.value
+    })
+
+    //搜索
+    function search() {
+        var content = document.getElementById('searchInput').value
+        if(getSearchSelect != "" && content != ""){
+            console.log(getSearchSelect)
+            checkSearch = true
+            table.reload('DataSheet', {
+                url: '/drawTable/',
+                where: {
+                    field: getSearchSelect,
+                    content: content,
+                    order: "search"
+                }
+            })
+        }else{
+            checkSearch = false
+            table.reload('DataSheet', {
+                url: '/drawTable/',
+                where: {
+                    field: '',
+                    order: 'null',
+                }
+            })
+            layer.open({
+                title: '提示',
+                content: '没选择搜索项或没输入搜索内容！'
+            })
+        }
+    }

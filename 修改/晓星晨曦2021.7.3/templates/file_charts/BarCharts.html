@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析-柱状图</title>
+    <link rel="shorcut icon" href="/statics/images/Barcharts.png">
+</head>
+<link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+<style type="text/css">
+    .layui-form-item {
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
+
+    .layui-form-label {
+        font-weight: bold;
+        font-size: 16px;
+        width: auto;
+        text-align: left;
+        margin:5px;
+    }
+
+    .MainItem {
+        top: 0;
+        border: 2px solid black;
+        width: auto;
+        height: auto;
+        margin-top: 1px;
+        margin-left: 2px;
+        text-align: center;
+    }
+
+    .ChooseItem {
+        display: inline-block;
+        border: 2px solid black;
+        font-weight: bold;
+    }
+
+    .layui-body {
+        position: absolute;
+    }
+
+    .ShowNav {
+        font-size: 18px;
+        font-weight: bold;
+        margin-left: 6px;
+        position: absolute;
+    }
+
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        border-bottom: 2px solid black;
+        border-top: 1px solid black;
+        font-size: 20px;
+    }
+</style>
+<body>
+{# 还原导航栏 #}
+<a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+   onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">
+    点击还原导航栏
+</a>
+
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="/BarCharts/">柱状图</a></dd>
+                <dd><a href="/LineCharts/">折线图</a></dd>
+                <dd><a href="/ScatterCharts/">散点图</a></dd>
+                <dd><a href="/PieCharts/">饼图</a></dd>
+                <dd><a href="/AreaCharts/">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <fieldset style="text-align: center;border-bottom: none;font-size: 20px;">
+        <legend><b>每次有60条数据</b></legend>
+    </fieldset>
+    <div class="MainItem">
+        <fieldset>
+            <legend style="font-size: 16px;"><b>X轴、Y轴、显示数据选择(<a style="text-decoration: underline;color:red">三者说明</a>)</b></legend>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;">10或20条</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">X轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="X_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <input class="layui-input" type="text" id="day_id">
+                        <select id="X_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;">默认全选</legend>
+            <div class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Y轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="Y_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Y_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;">默认全选</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">显示数据:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="DataS_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Data_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="BarCharts1" style="width: auto;height: 300px;"></div>
+</div>
+</body>
+<script src="/statics/plugins/Echarts/echarts.common.js"></script>
+<script src="/statics/js/EchartsStyle.js"></script>
+<script src="/statics/js/jquery-3.6.0.min.js"></script>
+<script src="/statics/js/jquery.cookie.js"></script>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/plugins/layui/xm-select.js"></script>
+<script>
+    var BarCharts1 = echarts.init(document.getElementById('BarCharts1'))
+
+    var option = {
+        title: {
+            text: 'ECharts 入门示例'
+        },
+        tooltip: {},
+        legend: {
+            data:['销量']
+        },
+        xAxis: {
+            data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+        },
+        yAxis: {},
+        series: [{
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        }]
+    };
+
+    BarCharts1.setOption(option)
+
+</script>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据表选择</title>
+    <link rel="shortcut icon" href="{% static 'images\favicon_Database.ico' %}" type="image/x-icon">
+</head>
+<script src="{% static "js\jquery-3.6.0.min.js" %}"></script>
+<script src="{% static "js\jquery.cookie.js" %}"></script>
+<script src="{% static "plugins\layui\layui.js" %}"></script>
+<link rel="stylesheet" href="{% static "plugins\layui\css\layui.css" %}">
+<style type="text/css">
+    .layui-body {
+        position: absolute;
+    }
+
+    .layui-table-cell{
+        height: 35px;
+    }
+
+    .ShowNav {
+        font-size: 16px;
+        position: absolute;
+    }
+</style>
+<body>
+{# 导航条 #}
+<div>
+    <a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+       onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">点击还原导航栏</a>
+</div>
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this"
+        ">
+        <a href="javascript:"
+           onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+    </div>
+    <div class="layui-nav-item">
+        <a href="javascript:">文件</a>
+        <dl class="layui-nav-child">
+            <dd><a href="/UploadFile/">文件上传</a></dd>
+        </dl>
+    </div>
+    <div class="layui-nav-item">
+        <a href="javascript:">图表展现</a>
+        <dl class="layui-nav-child">
+            <dd><a href="">数据表</a></dd>
+            <dd><a href="">柱状图</a></dd>
+            <dd><a href="">折线图</a></dd>
+            <dd><a href="">散点图</a></dd>
+            <dd><a href="">饼图</a></dd>
+            <dd><a href="">面积图</a></dd>
+        </dl>
+    </div>
+</div>
+
+{# table部分 #}
+<div class="layui-body" id="WorkBody">
+    <fieldset style="border-style: hidden">
+        <legend style="text-align: center;font-size: 32px;"><b>数据表选择</b></legend>
+        <table id="TableChoose" lay-filter="TableAction"></table>
+    </fieldset>
+</div>
+
+{# table工具栏 #}
+<script type="text/html" id="TableTool">
+    <form id="Postform" method="post" action="">
+        {% csrf_token %}
+        <a id="look" class="layui-btn" lay-event="look">查看</a>
+        <a id="delete" class="layui-btn" lay-event="delete">删除</a>
+    </form>
+</script>
+
+<script>
+
+    var a_look = document.getElementById('look')
+
+    window.onload = function(){
+        var name = new FormData()
+        name.append('DataBase', 'match_data')
+        $.ajax({
+            url: "/GetTableName/",
+            headers: { "X-CSRFtoken":$.cookie("csrftoken")},
+            data: name,
+            type: "Post",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success:function (result) {
+
+            }
+        })
+    }
+
+    layui.use(['layer', 'laydate', 'table'], function () {
+        var layer = layui.layer
+        var table = layui.table
+
+        table.render({
+            elem: '#TableChoose',
+            height: 600,
+            cellMinWidth: 80,
+            cols: [[
+                {field: '数据表名', title: '数据表名', sort:true},
+                {field: '最后一次上传/修改日期', title: '最后一次上传/修改日期', sort: true},
+                {field: '最后一次查看日期', title: '最后一次查看日期', sort: true},
+                {field: '操作', title: '操作', toolbar:'#TableTool'}
+            ]],
+            page: {
+                limit: 10,
+            },
+            data: [{
+                '数据表名': '1',
+                '最后一次上传/修改日期': '2',
+                '最后一次查看日期': '3'
+            }]
+        })
+
+        table.on('tool(TableAction)', function (obj) {
+            switch (obj.event) {
+                case 'look':
+                    var PostForm = document.getElementById('Postform')
+                    PostForm.action = '/DataSheet/?table='
+                    PostForm.submit()
+                    break;
+                case 'delete':
+                    break;
+            }
+        })
+
+    })
+
+
+</script>
+</body>
+</html>

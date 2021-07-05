@@ -1,9 +1,7 @@
-{% extends 'index.html' %}
+{% extends 'index.html'%}
 {% block main %}
     <script>
         function drawCharts_two(XName, XAllData, i, j) {
-        console.log(GetResponseData)
-        console.log(datas)
         var formatterY = '{value}'
         try {
             if (GetY_ChooseItem[j].name == "客座率")
@@ -21,7 +19,8 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'bar',
+                        type: 'line',
+                        stack: 'all',
                         data: [datas[i][k], datas[i][6 + k], datas[i][12 + k], datas[i][18 + k], datas[i][24 + k], datas[i][30 + k], datas[i][36 + k], datas[i][42 + k], datas[i][48 + k], datas[i][54 + k]],
                         emphasis: {
                             focus: 'series'
@@ -39,7 +38,8 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'bar',
+                        type: 'line',
+                        stack: 'all',
                         data: [datas[j][k], datas[j][3 + k], datas[j][6 + k], datas[j][9 + k], datas[j][12 + k], datas[j][15 + k], datas[j][18 + k], datas[j][21 + k], datas[j][24 + k], datas[j][27 + k],
                             datas[j][30 + k], datas[j][33 + k], datas[j][36 + k], datas[j][39 + k], datas[j][42 + k], datas[j][45 + k], datas[j][48 + k], datas[j][51 + k], datas[j][54 + k], datas[j][57 + k]],
 
@@ -55,8 +55,6 @@
                 )
             }
         }
-        console.log("seriess:" + seriess)
-        console.log(GetX_ChooseItem.length)
         var option = {
             title: {
                 text: YItemName[j]

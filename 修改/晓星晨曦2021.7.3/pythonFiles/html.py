@@ -29,6 +29,22 @@ def BarCharts(request):
     return render(request, "file_charts/BarCharts.html")
 
 
+def LineCharts(request):
+    return render(request, "file_charts/LineCharts.html")
+
+
+def AreaCharts(request):
+    return render(request, "file_charts/AreaCharts.html")
+
+
+def PieCharts(request):
+    return render(request, "file_charts/PieCharts.html")
+
+
+def ScatterCharts(request):
+    return render(request, "file_charts/ScatterCharts.html")
+
+
 def GetData(request):
     cursor = connection.cursor()
     cursor.execute('select count(*) from milion_data')

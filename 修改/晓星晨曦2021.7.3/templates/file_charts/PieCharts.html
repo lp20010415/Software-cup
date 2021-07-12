@@ -1,157 +1,496 @@
-{% extends 'index.html' %}
-{% block main %}
-    <script>
-        function sum(arr) {
-            return eval(arr.join("+"));
-        };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析</title>
+</head>
+<link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+<style type="text/css">
+    .layui-form-item {
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
 
-        function drawCharts_two(XName, XAllData, i, j) {
-            console.log("sum:" + sum(datas[i].slice(0, 6)))
-            var formatterY = '{value}'
-            try {
-                if (GetY_ChooseItem[j].name == "客座率")
-                    formatterY = '{value}%'
-            } catch (e) {
-                if (i == 10)
-                    formatterY = '{value}%'
-            }
+    .layui-form-label {
+        font-weight: bold;
+        font-size: 16px;
+        width: auto;
+        text-align: left;
+        margin: 5px;
+    }
 
-            var BarCharts1 = echarts.init(document.getElementById('charts' + i), 'westeros')
-            var seriess = []
-            if (GetX_ChooseItem.length == 10) {
-                for (let k = 0; k < datas[i].length / 10; k++) {
-                    seriess.push(
-                        {
-                            name: YItemName[j],
-                            type: 'pie',
-                            radius: ['40%', '70%'],
-                            avoidLabelOverlap: false,
-                            itemStyle: {
-                                borderRadius: 10,
-                                borderColor: '#fff',
-                                borderWidth: 2
-                            },
-                            label: {
-                                show: false,
-                                position: 'center'
-                            },
-                            emphasis: {
-                                label: {
-                                    show: true,
-                                    fontSize: '20',
-                                    fontWeight: 'bold'
-                                }
-                            },
-                            labelLine: {
-                                show: false
-                            },
-                            data: [
-                                {value: sum(datas[i].slice(0, 6)), name: PostData[0]},
-                                {value: sum(datas[i].slice(6, 12)), name: PostData[1]},
-                                {value: sum(datas[i].slice(12, 18)), name: PostData[2]},
-                                {value: sum(datas[i].slice(18, 24)), name: PostData[3]},
-                                {value: sum(datas[i].slice(24, 30)), name: PostData[4]},
-                                {value: sum(datas[i].slice(30, 36)), name: PostData[5]},
-                                {value: sum(datas[i].slice(36, 42)), name: PostData[6]},
-                                {value: sum(datas[i].slice(42, 48)), name: PostData[7]},
-                                {value: sum(datas[i].slice(48, 54)), name: PostData[8]},
-                                {value: sum(datas[i].slice(54, 60)), name: PostData[9]}
-                            ]
-                        }
-                    )
+    .MainItem {
+        top: 0;
+        border: 2px solid black;
+        width: auto;
+        height: auto;
+        margin-top: 1px;
+        margin-left: 2px;
+        text-align: center;
+    }
+
+    .ChooseItem {
+        display: inline-block;
+        border: 2px solid black;
+        font-weight: bold;
+    }
+
+    .layui-body {
+        position: absolute;
+    }
+
+    .ShowNav {
+        font-size: 18px;
+        font-weight: bold;
+        margin-left: 6px;
+        position: absolute;
+    }
+
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        border-bottom: 2px solid black;
+        border-top: 1px solid black;
+        font-size: 20px;
+    }
+</style>
+<body>
+{# 还原导航栏 #}
+<a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+   onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">
+    点击还原导航栏
+</a>
+
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="/BarCharts/">柱状图</a></dd>
+                <dd><a href="/LineCharts/">折线图</a></dd>
+                <dd><a href="/ScatterCharts/">散点图</a></dd>
+                <dd><a href="/PieCharts/">饼图</a></dd>
+                <dd><a href="/AreaCharts/">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <fieldset style="text-align: center;border-bottom: none;font-size: 20px;">
+        <legend><b>每次有60条数据</b></legend>
+    </fieldset>
+    <div class="MainItem">
+        <fieldset>
+            <legend style="font-size: 16px;">
+                <b>X轴、Y轴、显示数据选择{#<a style="text-decoration: underline;color:red">三者说明</a>#}</b></legend>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;" id="XText">10或20项(已项0项)</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">X轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="X_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <input class="layui-input" type="text" id="day_id">
+                        <select id="X_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;" id="YText">默认全选</legend>
+            <div class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Y轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="Y_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Y_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="drawCharts_GetData()">确定</button>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="cancel()">取消</button>
+        </fieldset>
+    </div>
+</div>
+
+</body>
+<script src="/statics/plugins/Echarts/echarts.js"></script>
+<script src="/statics/js/EchartsStyle.js"></script>
+<script src="/statics/js/jquery-3.6.0.min.js"></script>
+<script src="/statics/js/jquery.cookie.js"></script>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/plugins/layui/xm-select.js"></script>
+<script src="/statics/js/div/index.js"></script>
+<script>
+    function sum(arr) {
+        return eval(arr.join("+"));
+    };
+
+    var ord =
+    {{ ordata|safe }}
+    var xord =
+    {{ xorData|safe }}
+    var name =
+        {{ name|safe }}
+        yname = name.split(",")
+    var xname =
+    {{ xname|safe }}
+    var arrayObj = []
+    for (var i = 0; i < ord.length; i++) {
+        var arrs = 'arr' + i
+        arrs = new Array()
+        arrs = ord[i].split(",")
+        arrayObj.push(arrs)
+    }
+    if (ord.length != 0) {
+        layer.open({
+            content: '您是否需要将原有数据，进行绘图？',
+            btn: ['确定', '取消'],
+            yes: function () {
+                pieDrawCharts_createElement()
+                for (let i = 0; i < arrayObj.length; i++) {
+                    createrPieCharts(i)
                 }
-            } else {
-                for (let k = 0; k < datas[i].length / 20; k++) {
-                    seriess.push(
-                        {
-                            name: YItemName[j],
-                            type: 'pie',
-                            radius: ['40%', '70%'],
-                            avoidLabelOverlap: false,
-                            itemStyle: {
-                                borderRadius: 10,
-                                borderColor: '#fff',
-                                borderWidth: 2
-                            },
-                            label: {
-                                show: false,
-                                position: 'center'
-                            },
-                            emphasis: {
-                                label: {
-                                    show: true,
-                                    fontSize: '20',
-                                    fontWeight: 'bold'
-                                }
-                            },
-                            labelLine: {
-                                show: false
-                            },
-                            data: [
-                                {value: sum(datas[i].slice(0, 3)), name: PostData[0]},
-                                {value: sum(datas[i].slice(3, 6)), name: PostData[1]},
-                                {value: sum(datas[i].slice(6, 9)), name: PostData[2]},
-                                {value: sum(datas[i].slice(9, 12)), name: PostData[3]},
-                                {value: sum(datas[i].slice(12, 15)), name: PostData[4]},
-                                {value: sum(datas[i].slice(15, 18)), name: PostData[5]},
-                                {value: sum(datas[i].slice(18, 21)), name: PostData[6]},
-                                {value: sum(datas[i].slice(21, 24)), name: PostData[7]},
-                                {value: sum(datas[i].slice(24, 27)), name: PostData[8]},
-                                {value: sum(datas[i].slice(27, 30)), name: PostData[9]},
-                                {value: sum(datas[i].slice(30, 33)), name: PostData[10]},
-                                {value: sum(datas[i].slice(33, 36)), name: PostData[11]},
-                                {value: sum(datas[i].slice(36, 39)), name: PostData[12]},
-                                {value: sum(datas[i].slice(39, 42)), name: PostData[13]},
-                                {value: sum(datas[i].slice(42, 45)), name: PostData[14]},
-                                {value: sum(datas[i].slice(45, 48)), name: PostData[15]},
-                                {value: sum(datas[i].slice(48, 51)), name: PostData[16]},
-                                {value: sum(datas[i].slice(51, 54)), name: PostData[17]},
-                                {value: sum(datas[i].slice(54, 57)), name: PostData[18]},
-                                {value: sum(datas[i].slice(57, 60)), name: PostData[19]},
-                            ]
-                        }
-                    )
-                }
+                $(".layui-layer-close1").trigger('click');
             }
-            var option = {
-                title: {
-                    text: YItemName[j]
-                },
-                /*tooltip: {
-                    showContent: false,
-                    axisPointer: {
-                        type: 'shadow'
-                    },
-                    trigger: 'axis',
-                    formatter: function (params, ticket, callback) {
-                        console.log("params:" + params)
-                        var res = params[0].name + '<br>'
-                        if (params[0].seriesName != "客座率") {
-                            for (let i = 0; i < params.length; i++) {
-                                res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "<br/>"
+        })
+    }
+
+    function createrPieCharts(i) {
+        var formatterY = '{value}'
+        var pieCharts = echarts.init(document.getElementById('charts' + i), 'westeros')
+        var pieseries = []
+        if (xord.length == 10) {
+            for (let k = 0; k < arrayObj[i].length / 10; k++) {
+                pieseries.push(
+                    {
+                        name: YItemName[yname[i]],
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '20',
+                                fontWeight: 'bold'
                             }
-                        } else {
-                            for (let i = 0; i < params.length; i++) {
-                                res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "%<br/>"
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: sum(arrayObj[i].slice(0, 6)), name: xord[0]},
+                            {value: sum(arrayObj[i].slice(6, 12)), name: xord[1]},
+                            {value: sum(arrayObj[i].slice(12, 18)), name: xord[2]},
+                            {value: sum(arrayObj[i].slice(18, 24)), name: xord[3]},
+                            {value: sum(arrayObj[i].slice(24, 30)), name: xord[4]},
+                            {value: sum(arrayObj[i].slice(30, 36)), name: xord[5]},
+                            {value: sum(arrayObj[i].slice(36, 42)), name: xord[6]},
+                            {value: sum(arrayObj[i].slice(42, 48)), name: xord[7]},
+                            {value: sum(arrayObj[i].slice(48, 54)), name: xord[8]},
+                            {value: sum(arrayObj[i].slice(54, 60)), name: xord[9]}
+                        ]
+                    }
+                )
+            }
+        } else {
+            for (let k = 0; k < arrayObj[i].length / 20; k++) {
+                pieseries.push(
+                    {
+                        name: YItemName[yname[i]],
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '20',
+                                fontWeight: 'bold'
                             }
-                        }
-                        return res
-                    },
-                },*/
-                tooltip: {
-                    trigger: 'item',
-                },
-                legend: {
-                    data: PostData,
-                    x: 'left',      //可设定图例在左、右、居中
-                    y: 'center',    //可设定图例在上、下、居中
-                    orient: 'vertical',
-                    padding: [50, 50, 0, 10],   //可设定图例[距上方距离，距右方距离，距下方距离，距左方距离]
-                },
-                calculable: true,
-                series: seriess
-            };
-            BarCharts1.setOption(option)
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: sum(arrayObj[i].slice(0, 3)), name: xord[0]},
+                            {value: sum(arrayObj[i].slice(3, 6)), name: xord[1]},
+                            {value: sum(arrayObj[i].slice(6, 9)), name: xord[2]},
+                            {value: sum(arrayObj[i].slice(9, 12)), name: xord[3]},
+                            {value: sum(arrayObj[i].slice(12, 15)), name: xord[4]},
+                            {value: sum(arrayObj[i].slice(15, 18)), name: xord[5]},
+                            {value: sum(arrayObj[i].slice(18, 21)), name: xord[6]},
+                            {value: sum(arrayObj[i].slice(21, 24)), name: xord[7]},
+                            {value: sum(arrayObj[i].slice(24, 27)), name: xord[8]},
+                            {value: sum(arrayObj[i].slice(27, 30)), name: xord[9]},
+                            {value: sum(arrayObj[i].slice(30, 33)), name: xord[10]},
+                            {value: sum(arrayObj[i].slice(33, 36)), name: xord[11]},
+                            {value: sum(arrayObj[i].slice(36, 39)), name: xord[12]},
+                            {value: sum(arrayObj[i].slice(39, 42)), name: xord[13]},
+                            {value: sum(arrayObj[i].slice(42, 45)), name: xord[14]},
+                            {value: sum(arrayObj[i].slice(45, 48)), name: xord[15]},
+                            {value: sum(arrayObj[i].slice(48, 51)), name: xord[16]},
+                            {value: sum(arrayObj[i].slice(51, 54)), name: xord[17]},
+                            {value: sum(arrayObj[i].slice(54, 57)), name: xord[18]},
+                            {value: sum(arrayObj[i].slice(57, 60)), name: xord[19]},
+                        ]
+                    }
+                )
+            }
         }
-    </script>
-{% endblock %}
+        var pieOption = {
+            title: {
+                text: YItemName[yname[i]]
+            },
+            /*tooltip: {
+                showContent: false,
+                axisPointer: {
+                    type: 'shadow'
+                },
+                trigger: 'axis',
+                formatter: function (params, ticket, callback) {
+                    console.log("params:" + params)
+                    var res = params[0].name + '<br>'
+                    if (params[0].seriesName != "客座率") {
+                        for (let i = 0; i < params.length; i++) {
+                            res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "<br/>"
+                        }
+                    } else {
+                        for (let i = 0; i < params.length; i++) {
+                            res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "%<br/>"
+                        }
+                    }
+                    return res
+                },
+            },*/
+            tooltip: {
+                trigger: 'item',
+            },
+            legend: {
+                data: xord,
+                x: 'left',      //可设定图例在左、右、居中
+                y: 'center',    //可设定图例在上、下、居中
+                orient: 'vertical',
+                padding: [50, 50, 0, 10],   //可设定图例[距上方距离，距右方距离，距下方距离，距左方距离]
+            },
+            calculable: true,
+            series: pieseries
+        }
+        pieCharts.setOption(pieOption)
+    }
+    function pieDrawCharts_createElement() {
+        for (let i = 0; i < ord.length; i++) {
+            var div1 = document.createElement('div')
+            var div2 = document.createElement('div')
+            var label = document.createElement('label')
+
+            var divCharts = document.createElement('div')
+            var divChartsN_D = document.createElement('div')
+
+            var WorkBody = document.getElementById('WorkBody')
+
+            divCharts.setAttribute('id', 'charts' + i)
+            divCharts.setAttribute('style', 'width:800px;height:300px')
+
+            divChartsN_D.setAttribute('id', 'N_D' + i)
+            divChartsN_D.setAttribute('style', 'width:300px;height:200px;')
+            label.setAttribute('id', 'labelN_D' + i)
+            label.innerHTML = "最大值:" + Math.max.apply(null, arrayObj[i]) + "&emsp;&emsp;&emsp;最小值:" + Math.min.apply(null, arrayObj[i]) + "<br>方差:" + varianceArr(arrayObj[i]) + "&emsp;&emsp;&emsp;标准差:" + stdDeviation(arrayObj[i])
+            div1.setAttribute('id', 'charts')
+            div1.setAttribute('class', 'layui-inline')
+            div1.append(divCharts)
+            div2.setAttribute('id', 'charts')
+            div2.setAttribute('class', 'layui-inline')
+            div2.append(label)
+            div2.append(divChartsN_D)
+            WorkBody.append(div1)
+            WorkBody.append(div2)
+        }
+    }
+    function drawCharts_two(XName, XAllData, i, j) {
+        var formatterY = '{value}'
+        try {
+            if (GetY_ChooseItem[j].name == "客座率")
+                formatterY = '{value}%'
+        } catch (e) {
+            if (i == 10)
+                formatterY = '{value}%'
+        }
+
+        var BarCharts1 = echarts.init(document.getElementById('charts' + i), 'westeros')
+        var seriess = []
+        if (GetX_ChooseItem.length == 10) {
+            for (let k = 0; k < datas[i].length / 10; k++) {
+                seriess.push(
+                    {
+                        name: YItemName[j],
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '20',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: sum(datas[i].slice(0, 6)), name: PostData[0]},
+                            {value: sum(datas[i].slice(6, 12)), name: PostData[1]},
+                            {value: sum(datas[i].slice(12, 18)), name: PostData[2]},
+                            {value: sum(datas[i].slice(18, 24)), name: PostData[3]},
+                            {value: sum(datas[i].slice(24, 30)), name: PostData[4]},
+                            {value: sum(datas[i].slice(30, 36)), name: PostData[5]},
+                            {value: sum(datas[i].slice(36, 42)), name: PostData[6]},
+                            {value: sum(datas[i].slice(42, 48)), name: PostData[7]},
+                            {value: sum(datas[i].slice(48, 54)), name: PostData[8]},
+                            {value: sum(datas[i].slice(54, 60)), name: PostData[9]}
+                        ]
+                    }
+                )
+            }
+        } else {
+            for (let k = 0; k < datas[i].length / 20; k++) {
+                seriess.push(
+                    {
+                        name: YItemName[j],
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '20',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            {value: sum(datas[i].slice(0, 3)), name: PostData[0]},
+                            {value: sum(datas[i].slice(3, 6)), name: PostData[1]},
+                            {value: sum(datas[i].slice(6, 9)), name: PostData[2]},
+                            {value: sum(datas[i].slice(9, 12)), name: PostData[3]},
+                            {value: sum(datas[i].slice(12, 15)), name: PostData[4]},
+                            {value: sum(datas[i].slice(15, 18)), name: PostData[5]},
+                            {value: sum(datas[i].slice(18, 21)), name: PostData[6]},
+                            {value: sum(datas[i].slice(21, 24)), name: PostData[7]},
+                            {value: sum(datas[i].slice(24, 27)), name: PostData[8]},
+                            {value: sum(datas[i].slice(27, 30)), name: PostData[9]},
+                            {value: sum(datas[i].slice(30, 33)), name: PostData[10]},
+                            {value: sum(datas[i].slice(33, 36)), name: PostData[11]},
+                            {value: sum(datas[i].slice(36, 39)), name: PostData[12]},
+                            {value: sum(datas[i].slice(39, 42)), name: PostData[13]},
+                            {value: sum(datas[i].slice(42, 45)), name: PostData[14]},
+                            {value: sum(datas[i].slice(45, 48)), name: PostData[15]},
+                            {value: sum(datas[i].slice(48, 51)), name: PostData[16]},
+                            {value: sum(datas[i].slice(51, 54)), name: PostData[17]},
+                            {value: sum(datas[i].slice(54, 57)), name: PostData[18]},
+                            {value: sum(datas[i].slice(57, 60)), name: PostData[19]},
+                        ]
+                    }
+                )
+            }
+        }
+        var option = {
+            title: {
+                text: YItemName[j]
+            },
+            /*tooltip: {
+                showContent: false,
+                axisPointer: {
+                    type: 'shadow'
+                },
+                trigger: 'axis',
+                formatter: function (params, ticket, callback) {
+                    console.log("params:" + params)
+                    var res = params[0].name + '<br>'
+                    if (params[0].seriesName != "客座率") {
+                        for (let i = 0; i < params.length; i++) {
+                            res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "<br/>"
+                        }
+                    } else {
+                        for (let i = 0; i < params.length; i++) {
+                            res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "%<br/>"
+                        }
+                    }
+                    return res
+                },
+            },*/
+            tooltip: {
+                trigger: 'item',
+            },
+            legend: {
+                data: PostData,
+                x: 'left',      //可设定图例在左、右、居中
+                y: 'center',    //可设定图例在上、下、居中
+                orient: 'vertical',
+                padding: [50, 50, 0, 10],   //可设定图例[距上方距离，距右方距离，距下方距离，距左方距离]
+            },
+            calculable: true,
+            series: seriess
+        };
+        BarCharts1.setOption(option)
+    }
+</script>
+</html>

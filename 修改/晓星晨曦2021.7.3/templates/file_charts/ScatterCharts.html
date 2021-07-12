@@ -1,9 +1,309 @@
-{% extends 'index.html' %}
-{% block main %}
-    <script>
-        function drawCharts_two(XName, XAllData, i, j) {
-        console.log(GetResponseData)
-        console.log(datas)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析</title>
+</head>
+<link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+<style type="text/css">
+    .layui-form-item {
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
+
+    .layui-form-label {
+        font-weight: bold;
+        font-size: 16px;
+        width: auto;
+        text-align: left;
+        margin: 5px;
+    }
+
+    .MainItem {
+        top: 0;
+        border: 2px solid black;
+        width: auto;
+        height: auto;
+        margin-top: 1px;
+        margin-left: 2px;
+        text-align: center;
+    }
+
+    .ChooseItem {
+        display: inline-block;
+        border: 2px solid black;
+        font-weight: bold;
+    }
+
+    .layui-body {
+        position: absolute;
+    }
+
+    .ShowNav {
+        font-size: 18px;
+        font-weight: bold;
+        margin-left: 6px;
+        position: absolute;
+    }
+
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        border-bottom: 2px solid black;
+        border-top: 1px solid black;
+        font-size: 20px;
+    }
+</style>
+<body>
+{# 还原导航栏 #}
+<a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+   onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">
+    点击还原导航栏
+</a>
+
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="/BarCharts/">柱状图</a></dd>
+                <dd><a href="/LineCharts/">折线图</a></dd>
+                <dd><a href="/ScatterCharts/">散点图</a></dd>
+                <dd><a href="/PieCharts/">饼图</a></dd>
+                <dd><a href="/AreaCharts/">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <fieldset style="text-align: center;border-bottom: none;font-size: 20px;">
+        <legend><b>每次有60条数据</b></legend>
+    </fieldset>
+    <div class="MainItem">
+        <fieldset>
+            <legend style="font-size: 16px;">
+                <b>X轴、Y轴、显示数据选择{#<a style="text-decoration: underline;color:red">三者说明</a>#}</b></legend>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;" id="XText">10或20项(已项0项)</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">X轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="X_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <input class="layui-input" type="text" id="day_id">
+                        <select id="X_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;" id="YText">默认全选</legend>
+            <div class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Y轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="Y_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Y_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="drawCharts_GetData()">确定</button>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="cancel()">取消</button>
+        </fieldset>
+    </div>
+</div>
+
+</body>
+<script src="/statics/plugins/Echarts/echarts.js"></script>
+<script src="/statics/js/EchartsStyle.js"></script>
+<script src="/statics/js/jquery-3.6.0.min.js"></script>
+<script src="/statics/js/jquery.cookie.js"></script>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/plugins/layui/xm-select.js"></script>
+<script src="/statics/js/div/index.js"></script>
+<script>
+    var ord =
+    {{ ordata|safe }}
+    var xord =
+    {{ xorData|safe }}
+    var name =
+        {{ name|safe }}
+        yname = name.split(",")
+    var xname =
+    {{ xname|safe }}
+    var arrayObj = []
+    for (var i = 0; i < ord.length; i++) {
+        var arrs = 'arr' + i
+        arrs = new Array()
+        arrs = ord[i].split(",")
+        arrayObj.push(arrs)
+    }
+    if (ord.length != 0) {
+        layer.open({
+            content: '您是否需要将原有数据，进行绘图？',
+            btn: ['确定', '取消'],
+            yes: function () {
+                scatterDrawCharts_createElement()
+                for (let i = 0; i < arrayObj.length; i++) {
+                    createrScatterCharts(i)
+                }
+                $(".layui-layer-close1").trigger('click');
+            }
+        })
+    }
+
+    function createrScatterCharts(i) {
+        var formatterY = '{value}'
+        var ScatterCharts = echarts.init(document.getElementById('charts' + i), 'westeros')
+        var scatterSeries = []
+        if (xord.length == 10) {
+            for (let k = 0; k < arrayObj[i].length / 10; k++) {
+                scatterSeries.push(
+                    {
+                        name: YItemName[yname[i]],
+                        type: 'effectScatter',
+                        showEffectOn: 'render', //'render', 'emphasis' 高亮（hover）的时候显示特效。
+                        rippleEffect: {
+                            //设置涟漪动画样式
+                            brushType: 'fill',//动画方式, 全填充或只有线条, 'stroke'
+                            scale: '2',// 涟漪规模
+                        },
+                        data: [arrayObj[i][k], arrayObj[i][6 + k], arrayObj[i][12 + k], arrayObj[i][18 + k], arrayObj[i][24 + k], arrayObj[i][30 + k], arrayObj[i][36 + k], arrayObj[i][42 + k], arrayObj[i][48 + k], arrayObj[i][54 + k]],
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        itemStyle: {
+                            normal: {
+                                barBorderRadius: 10,
+                            },
+                        },
+                    },
+                )
+            }
+        } else {
+            for (let k = 0; k < arrayObj[i].length / 20; k++) {
+                scatterSeries.push(
+                    {
+                        name: YItemName[yname[i]],
+                        type: 'effectScatter',
+                        data: [arrayObj[i][k], arrayObj[i][3 + k], arrayObj[i][6 + k], arrayObj[i][9 + k], arrayObj[i][12 + k], arrayObj[i][15 + k], arrayObj[i][18 + k], arrayObj[i][21 + k], arrayObj[i][24 + k], arrayObj[i][27 + k],
+                            arrayObj[i][30 + k], arrayObj[i][33 + k], arrayObj[i][36 + k], arrayObj[i][39 + k], arrayObj[i][42 + k], arrayObj[i][45 + k], arrayObj[i][48 + k], arrayObj[i][51 + k], arrayObj[i][54 + k], arrayObj[i][57 + k]],
+
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        itemStyle: {
+                            normal: {
+                                barBorderRadius: 10,
+                            },
+                        },
+                    },
+                )
+            }
+        }
+        var scatterOption = {
+            title: {
+                text: YItemName[yname[i]]
+            },
+            tooltip: {
+                formatter: function (params, ticket, callback) {
+                    var res = params[0].name + '<br>'
+                    if (params[0].seriesName != "客座率") {
+                        for (let i = 0; i < params.length; i++) {
+                            res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "<br/>"
+                        }
+                    } else {
+                        for (let i = 0; i < params.length; i++) {
+                            res += "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[i].seriesName + params[i].data + "%<br/>"
+                        }
+                    }
+                    return res
+                },
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: [YItemName[yname[i]]]
+            },
+            calculable: true,
+            xAxis: {
+                name: xname,
+                type: 'category',
+                data: xord,
+                axisLabel: {
+                    rotate: 30
+                }
+            },
+            yAxis: {
+                name: YItemName[yname[i]],
+                type: 'value',
+                axisLine: {
+                    show: true
+                },
+                axisLabel: {
+                    show: true,
+                    formatter: formatterY
+                }
+            },
+            series: scatterSeries
+        }
+        ScatterCharts.setOption(scatterOption)
+    }
+
+    function scatterDrawCharts_createElement() {
+        for (let i = 0; i < ord.length; i++) {
+            var div1 = document.createElement('div')
+            var div2 = document.createElement('div')
+            var label = document.createElement('label')
+
+            var divCharts = document.createElement('div')
+            var divChartsN_D = document.createElement('div')
+
+            var WorkBody = document.getElementById('WorkBody')
+
+            divCharts.setAttribute('id', 'charts' + i)
+            divCharts.setAttribute('style', 'width:800px;height:300px')
+
+            divChartsN_D.setAttribute('id', 'N_D' + i)
+            divChartsN_D.setAttribute('style', 'width:300px;height:200px;')
+            label.setAttribute('id', 'labelN_D' + i)
+            label.innerHTML = "最大值:" + Math.max.apply(null, arrayObj[i]) + "&emsp;&emsp;&emsp;最小值:" + Math.min.apply(null, arrayObj[i]) + "<br>方差:" + varianceArr(arrayObj[i]) + "&emsp;&emsp;&emsp;标准差:" + stdDeviation(arrayObj[i])
+            div1.setAttribute('id', 'charts')
+            div1.setAttribute('class', 'layui-inline')
+            div1.append(divCharts)
+            div2.setAttribute('id', 'charts')
+            div2.setAttribute('class', 'layui-inline')
+            div2.append(label)
+            div2.append(divChartsN_D)
+            WorkBody.append(div1)
+            WorkBody.append(div2)
+        }
+    }
+
+    function drawCharts_two(XName, XAllData, i, j) {
         var formatterY = '{value}'
         try {
             if (GetY_ChooseItem[j].name == "客座率")
@@ -12,22 +312,20 @@
             if (i == 10)
                 formatterY = '{value}%'
         }
-
-        var BarCharts1 = echarts.init(document.getElementById('charts' + i),'westeros')
+        var BarCharts1 = echarts.init(document.getElementById('charts' + i), 'westeros')
         var seriess = []
-        console.log(i)
         if (GetX_ChooseItem.length == 10) {
             for (let k = 0; k < datas[i].length / 10; k++) {
                 seriess.push(
                     {
                         name: YItemName[j],
                         type: 'effectScatter',
-                            showEffectOn: 'render', //'render', 'emphasis' 高亮（hover）的时候显示特效。
-                            rippleEffect: {
-                                //设置涟漪动画样式
-                                brushType: 'fill',//动画方式, 全填充或只有线条, 'stroke'
-                                scale: '2',// 涟漪规模
-                            },
+                        showEffectOn: 'render', //'render', 'emphasis' 高亮（hover）的时候显示特效。
+                        rippleEffect: {
+                            //设置涟漪动画样式
+                            brushType: 'fill',//动画方式, 全填充或只有线条, 'stroke'
+                            scale: '2',// 涟漪规模
+                        },
                         data: [datas[i][k], datas[i][6 + k], datas[i][12 + k], datas[i][18 + k], datas[i][24 + k], datas[i][30 + k], datas[i][36 + k], datas[i][42 + k], datas[i][48 + k], datas[i][54 + k]],
                         emphasis: {
                             focus: 'series'
@@ -45,7 +343,7 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'line',
+                        type: 'effectScatter',
                         data: [datas[j][k], datas[j][3 + k], datas[j][6 + k], datas[j][9 + k], datas[j][12 + k], datas[j][15 + k], datas[j][18 + k], datas[j][21 + k], datas[j][24 + k], datas[j][27 + k],
                             datas[j][30 + k], datas[j][33 + k], datas[j][36 + k], datas[j][39 + k], datas[j][42 + k], datas[j][45 + k], datas[j][48 + k], datas[j][51 + k], datas[j][54 + k], datas[j][57 + k]],
 
@@ -113,5 +411,5 @@
         };
         BarCharts1.setOption(option)
     }
-    </script>
-{% endblock %}
+</script>
+</html>

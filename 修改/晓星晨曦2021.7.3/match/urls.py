@@ -30,6 +30,7 @@ urlpatterns = [
     path('index/', html.index),
     path('test/', html.GetData),
     path('test1/', html.test),
+    path("indexApi/",html.indexApi),
     path('GetData/', Action.getData),
     path('UploadFile/', Action.UploadFile),
     path('drawTable/', Action.drawTable),

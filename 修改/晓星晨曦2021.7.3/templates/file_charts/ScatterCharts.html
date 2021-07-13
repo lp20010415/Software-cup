@@ -164,55 +164,31 @@
             content: '您是否需要将原有数据，进行绘图？',
             btn: ['确定', '取消'],
             yes: function () {
-                barDrawCharts_createElement()
+                scatterDrawCharts_createElement()
                 for (let i = 0; i < arrayObj.length; i++) {
-                    createrBarCharts(i)
+                    createrScatterCharts(i)
                 }
                 $(".layui-layer-close1").trigger('click');
             }
         })
     }
 
-    //根据ord数组长度，生成对应个div
-    function barDrawCharts_createElement() {
-        for (let i = 0; i < ord.length; i++) {
-            var div1 = document.createElement('div')
-            var div2 = document.createElement('div')
-            var label = document.createElement('label')
-
-            var divCharts = document.createElement('div')
-            var divChartsN_D = document.createElement('div')
-
-            var WorkBody = document.getElementById('WorkBody')
-
-            divCharts.setAttribute('id', 'charts' + i)
-            divCharts.setAttribute('style', 'width:800px;height:300px')
-
-            divChartsN_D.setAttribute('id', 'N_D' + i)
-            divChartsN_D.setAttribute('style', 'width:300px;height:200px;')
-            label.setAttribute('id', 'labelN_D' + i)
-            label.innerHTML = "最大值:" + Math.max.apply(null, arrayObj[i]) + "&emsp;&emsp;&emsp;最小值:" + Math.min.apply(null, arrayObj[i]) + "<br>方差:" + varianceArr(arrayObj[i]) + "&emsp;&emsp;&emsp;标准差:" + stdDeviation(arrayObj[i])
-            div1.setAttribute('id', 'charts')
-            div1.setAttribute('class', 'layui-inline')
-            div1.append(divCharts)
-            div2.setAttribute('id', 'charts')
-            div2.setAttribute('class', 'layui-inline')
-            div2.append(label)
-            div2.append(divChartsN_D)
-            WorkBody.append(div1)
-            WorkBody.append(div2)
-        }
-    }
-
-    function createrBarCharts(i) {
+    function createrScatterCharts(i) {
         var formatterY = '{value}'
-        var seriess = []
+        var ScatterCharts = echarts.init(document.getElementById('charts' + i), 'westeros')
+        var scatterSeries = []
         if (xord.length == 10) {
             for (let k = 0; k < arrayObj[i].length / 10; k++) {
-                seriess.push(
+                scatterSeries.push(
                     {
                         name: YItemName[yname[i]],
-                        type: 'bar',
+                        type: 'effectScatter',
+                        showEffectOn: 'render', //'render', 'emphasis' 高亮（hover）的时候显示特效。
+                        rippleEffect: {
+                            //设置涟漪动画样式
+                            brushType: 'fill',//动画方式, 全填充或只有线条, 'stroke'
+                            scale: '2',// 涟漪规模
+                        },
                         data: [arrayObj[i][k], arrayObj[i][6 + k], arrayObj[i][12 + k], arrayObj[i][18 + k], arrayObj[i][24 + k], arrayObj[i][30 + k], arrayObj[i][36 + k], arrayObj[i][42 + k], arrayObj[i][48 + k], arrayObj[i][54 + k]],
                         emphasis: {
                             focus: 'series'
@@ -225,12 +201,12 @@
                     },
                 )
             }
-        } else if (xord.length == 20) {
+        } else {
             for (let k = 0; k < arrayObj[i].length / 20; k++) {
-                seriess.push(
+                scatterSeries.push(
                     {
                         name: YItemName[yname[i]],
-                        type: 'bar',
+                        type: 'effectScatter',
                         data: [arrayObj[i][k], arrayObj[i][3 + k], arrayObj[i][6 + k], arrayObj[i][9 + k], arrayObj[i][12 + k], arrayObj[i][15 + k], arrayObj[i][18 + k], arrayObj[i][21 + k], arrayObj[i][24 + k], arrayObj[i][27 + k],
                             arrayObj[i][30 + k], arrayObj[i][33 + k], arrayObj[i][36 + k], arrayObj[i][39 + k], arrayObj[i][42 + k], arrayObj[i][45 + k], arrayObj[i][48 + k], arrayObj[i][51 + k], arrayObj[i][54 + k], arrayObj[i][57 + k]],
 
@@ -246,9 +222,7 @@
                 )
             }
         }
-
-        var LineCharts = echarts.init(document.getElementById('charts' + i), 'westeros')
-        var lineOption = {
+        var scatterOption = {
             title: {
                 text: YItemName[yname[i]]
             },
@@ -294,9 +268,39 @@
                     formatter: formatterY
                 }
             },
-            series: seriess
-        };
-        LineCharts.setOption(lineOption)
+            series: scatterSeries
+        }
+        ScatterCharts.setOption(scatterOption)
+    }
+
+    function scatterDrawCharts_createElement() {
+        for (let i = 0; i < ord.length; i++) {
+            var div1 = document.createElement('div')
+            var div2 = document.createElement('div')
+            var label = document.createElement('label')
+
+            var divCharts = document.createElement('div')
+            var divChartsN_D = document.createElement('div')
+
+            var WorkBody = document.getElementById('WorkBody')
+
+            divCharts.setAttribute('id', 'charts' + i)
+            divCharts.setAttribute('style', 'width:800px;height:300px')
+
+            divChartsN_D.setAttribute('id', 'N_D' + i)
+            divChartsN_D.setAttribute('style', 'width:300px;height:200px;')
+            label.setAttribute('id', 'labelN_D' + i)
+            label.innerHTML = "最大值:" + Math.max.apply(null, arrayObj[i]) + "&emsp;&emsp;&emsp;最小值:" + Math.min.apply(null, arrayObj[i]) + "<br>方差:" + varianceArr(arrayObj[i]) + "&emsp;&emsp;&emsp;标准差:" + stdDeviation(arrayObj[i])
+            div1.setAttribute('id', 'charts')
+            div1.setAttribute('class', 'layui-inline')
+            div1.append(divCharts)
+            div2.setAttribute('id', 'charts')
+            div2.setAttribute('class', 'layui-inline')
+            div2.append(label)
+            div2.append(divChartsN_D)
+            WorkBody.append(div1)
+            WorkBody.append(div2)
+        }
     }
 
     function drawCharts_two(XName, XAllData, i, j) {
@@ -308,7 +312,6 @@
             if (i == 10)
                 formatterY = '{value}%'
         }
-
         var BarCharts1 = echarts.init(document.getElementById('charts' + i), 'westeros')
         var seriess = []
         if (GetX_ChooseItem.length == 10) {
@@ -316,7 +319,13 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'bar',
+                        type: 'effectScatter',
+                        showEffectOn: 'render', //'render', 'emphasis' 高亮（hover）的时候显示特效。
+                        rippleEffect: {
+                            //设置涟漪动画样式
+                            brushType: 'fill',//动画方式, 全填充或只有线条, 'stroke'
+                            scale: '2',// 涟漪规模
+                        },
                         data: [datas[i][k], datas[i][6 + k], datas[i][12 + k], datas[i][18 + k], datas[i][24 + k], datas[i][30 + k], datas[i][36 + k], datas[i][42 + k], datas[i][48 + k], datas[i][54 + k]],
                         emphasis: {
                             focus: 'series'
@@ -334,7 +343,7 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'bar',
+                        type: 'effectScatter',
                         data: [datas[j][k], datas[j][3 + k], datas[j][6 + k], datas[j][9 + k], datas[j][12 + k], datas[j][15 + k], datas[j][18 + k], datas[j][21 + k], datas[j][24 + k], datas[j][27 + k],
                             datas[j][30 + k], datas[j][33 + k], datas[j][36 + k], datas[j][39 + k], datas[j][42 + k], datas[j][45 + k], datas[j][48 + k], datas[j][51 + k], datas[j][54 + k], datas[j][57 + k]],
 
@@ -350,6 +359,8 @@
                 )
             }
         }
+        console.log("seriess:" + seriess)
+        console.log(GetX_ChooseItem.length)
         var option = {
             title: {
                 text: YItemName[j]

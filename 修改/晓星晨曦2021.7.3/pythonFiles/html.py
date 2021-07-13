@@ -8,6 +8,22 @@ from django.urls import reverse
 from DataAction.Action import simplify
 from match.settings import BASE_DIR
 
+orData = []
+xorData = []
+name = []
+xname=""
+
+def indexApi(request):
+    global orData
+    global xorData
+    global name
+    global xname
+    orData = request.POST.getlist("orData")
+    xorData = request.POST.getlist("xorData")
+    name = request.POST.getlist("name")
+    xname= request.POST.get("xname")
+    return render(request, "file_charts/indexApi.html")
+
 
 def test(request):
     return render(request, 'test.html')
@@ -26,7 +42,48 @@ def DataSheet(request):
 
 
 def BarCharts(request):
-    return render(request, "file_charts/BarCharts.html")
+    return render(request, "file_charts/BarCharts.html", {
+        "ordata": json.dumps(orData),
+        "xorData": json.dumps(xorData),
+        "name":json.dumps(name),
+        "xname":json.dumps(xname)
+    })
+
+
+def LineCharts(request):
+    return render(request, 'file_charts/LineCharts.html', {
+        "ordata": json.dumps(orData),
+        "xorData": json.dumps(xorData),
+        "name":json.dumps(name),
+        "xname":json.dumps(xname)
+    })
+
+
+def AreaCharts(request):
+    return render(request, "file_charts/AreaCharts.html", {
+        "ordata": json.dumps(orData),
+        "xorData": json.dumps(xorData),
+        "name":json.dumps(name),
+        "xname":json.dumps(xname)
+    })
+
+
+def PieCharts(request):
+    return render(request, "file_charts/PieCharts.html",{
+        "ordata": json.dumps(orData),
+        "xorData": json.dumps(xorData),
+        "name":json.dumps(name),
+        "xname":json.dumps(xname)
+    })
+
+
+def ScatterCharts(request):
+    return render(request, "file_charts/ScatterCharts.html",{
+        "ordata": json.dumps(orData),
+        "xorData": json.dumps(xorData),
+        "name":json.dumps(name),
+        "xname":json.dumps(xname)
+    })
 
 
 def GetData(request):

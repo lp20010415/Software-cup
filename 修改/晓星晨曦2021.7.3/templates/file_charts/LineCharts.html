@@ -146,12 +146,12 @@
     var ord =
     {{ ordata|safe }}
     var xord =
-    {{ xorData|safe }}
-    var name =
+        {{ xorData|safe }}
+    var name=
         {{ name|safe }}
-        yname = name.split(",")
-    var xname =
-    {{ xname|safe }}
+    yname=name.split(",")
+    var xname=
+        {{ xname|safe }}
     var arrayObj = []
     for (var i = 0; i < ord.length; i++) {
         var arrs = 'arr' + i
@@ -164,9 +164,9 @@
             content: '您是否需要将原有数据，进行绘图？',
             btn: ['确定', '取消'],
             yes: function () {
-                barDrawCharts_createElement()
+                drawCharts_createElement1()
                 for (let i = 0; i < arrayObj.length; i++) {
-                    createrBarCharts(i)
+                    createrLineCharts(i)
                 }
                 $(".layui-layer-close1").trigger('click');
             }
@@ -174,7 +174,7 @@
     }
 
     //根据ord数组长度，生成对应个div
-    function barDrawCharts_createElement() {
+    function drawCharts_createElement1() {
         for (let i = 0; i < ord.length; i++) {
             var div1 = document.createElement('div')
             var div2 = document.createElement('div')
@@ -204,33 +204,35 @@
         }
     }
 
-    function createrBarCharts(i) {
+    function createrLineCharts(i) {
         var formatterY = '{value}'
         var seriess = []
-        if (xord.length == 10) {
-            for (let k = 0; k < arrayObj[i].length / 10; k++) {
-                seriess.push(
-                    {
-                        name: YItemName[yname[i]],
-                        type: 'bar',
-                        data: [arrayObj[i][k], arrayObj[i][6 + k], arrayObj[i][12 + k], arrayObj[i][18 + k], arrayObj[i][24 + k], arrayObj[i][30 + k], arrayObj[i][36 + k], arrayObj[i][42 + k], arrayObj[i][48 + k], arrayObj[i][54 + k]],
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        itemStyle: {
-                            normal: {
-                                barBorderRadius: 10,
-                            },
+        if (xord.length==10){
+             for (let k = 0; k < arrayObj[i].length / 10; k++) {
+            seriess.push(
+                {
+                    name: YItemName[yname[i]],
+                    type: 'line',
+                    stack: 'all',
+                    data: [arrayObj[i][k], arrayObj[i][6 + k], arrayObj[i][12 + k], arrayObj[i][18 + k], arrayObj[i][24 + k], arrayObj[i][30 + k], arrayObj[i][36 + k], arrayObj[i][42 + k], arrayObj[i][48 + k], arrayObj[i][54 + k]],
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    itemStyle: {
+                        normal: {
+                            barBorderRadius: 10,
                         },
                     },
-                )
-            }
-        } else if (xord.length == 20) {
+                },
+            )
+        }
+        }else if(xord.length==20) {
             for (let k = 0; k < arrayObj[i].length / 20; k++) {
                 seriess.push(
                     {
                         name: YItemName[yname[i]],
-                        type: 'bar',
+                        type: 'line',
+                        stack: 'all',
                         data: [arrayObj[i][k], arrayObj[i][3 + k], arrayObj[i][6 + k], arrayObj[i][9 + k], arrayObj[i][12 + k], arrayObj[i][15 + k], arrayObj[i][18 + k], arrayObj[i][21 + k], arrayObj[i][24 + k], arrayObj[i][27 + k],
                             arrayObj[i][30 + k], arrayObj[i][33 + k], arrayObj[i][36 + k], arrayObj[i][39 + k], arrayObj[i][42 + k], arrayObj[i][45 + k], arrayObj[i][48 + k], arrayObj[i][51 + k], arrayObj[i][54 + k], arrayObj[i][57 + k]],
 
@@ -316,7 +318,8 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'bar',
+                        type: 'line',
+                        stack: 'all',
                         data: [datas[i][k], datas[i][6 + k], datas[i][12 + k], datas[i][18 + k], datas[i][24 + k], datas[i][30 + k], datas[i][36 + k], datas[i][42 + k], datas[i][48 + k], datas[i][54 + k]],
                         emphasis: {
                             focus: 'series'
@@ -334,7 +337,8 @@
                 seriess.push(
                     {
                         name: YItemName[j],
-                        type: 'bar',
+                        type: 'line',
+                        stack: 'all',
                         data: [datas[j][k], datas[j][3 + k], datas[j][6 + k], datas[j][9 + k], datas[j][12 + k], datas[j][15 + k], datas[j][18 + k], datas[j][21 + k], datas[j][24 + k], datas[j][27 + k],
                             datas[j][30 + k], datas[j][33 + k], datas[j][36 + k], datas[j][39 + k], datas[j][42 + k], datas[j][45 + k], datas[j][48 + k], datas[j][51 + k], datas[j][54 + k], datas[j][57 + k]],
 
@@ -400,5 +404,6 @@
         };
         BarCharts1.setOption(option)
     }
+
 </script>
 </html>

@@ -238,15 +238,9 @@ function drawCharts_Draw() {
         }
         if (checkDrawTwo) {
             drawCharts_createElement(GetY_ChooseItem.length)
-            XAllData = drawCharts_Classify(GetResponseData.length)
-            drawCharts_findMaxAndMin(XAllData)
-            drawCharts_caculateVariacneAndS_D(XAllData)
             drawCharts_one(XName, XAllData, GetY_ChooseItem.length)
             checkDrawOne = false
         } else {
-            XAllData = drawCharts_Classify(GetResponseData.length)
-            drawCharts_findMaxAndMin(XAllData)
-            drawCharts_caculateVariacneAndS_D(XAllData)
             drawCharts_one(XName, XAllData, GetY_ChooseItem.length)
         }
     }

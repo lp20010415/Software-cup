@@ -14,7 +14,8 @@ from xlrd import xldate_as_tuple
 from match.settings import BASE_DIR
 
 
-def haha(request):  # 用于测试数据
+#   用于测试数据
+def haha(request):
     if request.method == 'POST':
         ha = []
         cursor = connection.cursor()

@@ -13,6 +13,8 @@ xorData = []
 name = []
 xname=""
 
+
+#   Api页面
 def indexApi(request):
     global orData
     global xorData
@@ -25,22 +27,17 @@ def indexApi(request):
     return render(request, "file_charts/indexApi.html")
 
 
-def test(request):
-    return render(request, 'test.html')
-
-
-def index(request):
-    return render(request, "index.html")
-
-
+#   上传文件
 def UploadFile(request):
     return render(request, "file_operation/UploadFile.html")
 
 
+#   数据表
 def DataSheet(request):
     return render(request, "file_charts/DataSheet.html")
 
 
+#   柱状图
 def BarCharts(request):
     return render(request, "file_charts/BarCharts.html", {
         "ordata": json.dumps(orData),
@@ -50,6 +47,7 @@ def BarCharts(request):
     })
 
 
+#   折线图
 def LineCharts(request):
     return render(request, 'file_charts/LineCharts.html', {
         "ordata": json.dumps(orData),
@@ -59,6 +57,7 @@ def LineCharts(request):
     })
 
 
+#   面积图
 def AreaCharts(request):
     return render(request, "file_charts/AreaCharts.html", {
         "ordata": json.dumps(orData),
@@ -68,6 +67,7 @@ def AreaCharts(request):
     })
 
 
+#   饼图
 def PieCharts(request):
     return render(request, "file_charts/PieCharts.html",{
         "ordata": json.dumps(orData),
@@ -77,6 +77,7 @@ def PieCharts(request):
     })
 
 
+#   散点图
 def ScatterCharts(request):
     return render(request, "file_charts/ScatterCharts.html",{
         "ordata": json.dumps(orData),
@@ -85,7 +86,8 @@ def ScatterCharts(request):
         "xname": json.dumps(xname)
     })
 
-#  测试
+
+#  测试获取数据
 def GetData(request):
     cursor = connection.cursor()
     cursor.execute('select count(*) from milion_data')
@@ -101,3 +103,13 @@ def GetData(request):
     }
     return render(request, 'GetData.html', {'data': 'alert("哈")'})
     # return render(request, 'GetData.html', {'data': json.dumps(giveBack, ensure_ascii=False)})
+
+
+#   测试页面
+def test(request):
+    return render(request, 'test.html')
+
+
+#   测试默认页面
+def index(request):
+    return render(request, "index.html")

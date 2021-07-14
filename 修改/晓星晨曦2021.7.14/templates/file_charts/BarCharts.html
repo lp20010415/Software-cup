@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>在线可视化数据分析</title>
+    <title>在线可视化数据分析(柱状图)</title>
+    <link rel="shortcut icon" href="/statics/images/Scatter_plot.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+    <link rel="stylesheet" href="/statics/css/index.css">
 </head>
-<link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
-<link rel="stylesheet" href="/statics/css/index.css">
 <body>
 {# 还原导航栏 #}
 <a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
@@ -116,6 +117,10 @@
             btn: ['确定', '取消'],
             yes: function () {
                 barDrawCharts_createElement()
+                for (let i = 0; i < arrayObj.length; i++) {
+                    createrBarCharts(i)
+                    drawCharts_drawN_D(i, arrayObj[i])
+                }
                 ChangeDisabled(xname[1])// 设置禁用
                 if (xname[1] === "day_id"){
                     for (let i = 0;i < xord.length;i++){
@@ -128,10 +133,6 @@
                 }
                 addItem(xord, "X")// 添加项
                 addItem(yname, "Y")// 添加项
-                for (let i = 0; i < arrayObj.length; i++) {
-                    createrBarCharts(i)
-                    drawCharts_drawN_D(i, arrayObj[i])
-                }
                 $(".layui-layer-close1").trigger('click');
             }
         })
@@ -156,7 +157,7 @@
             divChartsN_D.setAttribute('id', 'N_D' + i)
             divChartsN_D.setAttribute('style', 'width:400px;height:200px;')
             label.setAttribute('id', 'labelN_D' + i)
-            if (value != 10)
+            if (value !== '客座率')
                 label.innerHTML = "总和:" + sum(arrayObj[i]).toFixed(2) + "&emsp;&emsp;&emsp;平均值:" + average(arrayObj[i]).toFixed(2) + "<br>最大值:" + (Math.max.apply(null, arrayObj[i])).toFixed(2) + "&emsp;&emsp;&emsp;最小值:" + (Math.min.apply(null, arrayObj[i])).toFixed(2) + "<br>方差:" + varianceArr(arrayObj[i]) + "<br>标准差:" + stdDeviation(arrayObj[i])
             else
                 label.innerHTML = "总和:" + sum(arrayObj[i]).toFixed(2) + "%" + "&emsp;&emsp;&emsp;平均值:" + average(arrayObj[i]).toFixed(2) + "%" + "<br>最大值:" + (Math.max.apply(null, arrayObj[i])).toFixed(2) + "%" + "&emsp;&emsp;&emsp;最小值:" + (Math.min.apply(null, arrayObj[i])).toFixed(2) + "%" + "<br>方差:" + varianceArr(arrayObj[i]) + "%" + "<br>标准差:" + stdDeviation(arrayObj[i]) + "%"
@@ -220,6 +221,22 @@
             title: {
                 text: YItemName[yname[i]]
             },
+        toolbox:{
+            show: true,
+            feature: {
+                dataView: {
+                    title: '数据视图',
+                    lang: ['数据视图', '退出', '刷新'],
+                    readOnly: false
+                },
+                restore: {
+                    title: '刷新'
+                },
+                saveAsImage: {
+                    title: '导出'
+                }
+            }
+        },
             tooltip: {
                 formatter: function (params, ticket, callback) {
                     var res = params[0].name + '<br>'

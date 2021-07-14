@@ -371,7 +371,11 @@ function drawCharts_drawN_D(i, data) {
         },
         tooltip: {
             formatter: function (params, ticket, callback) {
-                var res = "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[0].name
+                let res = ""
+                if (YItemName[i] !== "客座率")
+                    res = "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[0].name
+                else
+                    res = "<span style='display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#5470c6;'></span>" + params[0].name + "%"
                 return res
             },
             trigger: 'axis',

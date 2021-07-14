@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>在线可视化数据分析</title>
+    <title>在线可视化数据分析(饼图)</title>
+    <link rel="shortcut icon" href="/statics/images/Pie_chart.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+    <link rel="stylesheet" href="/statics/css/index.css">
 </head>
-<link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
-<link rel="stylesheet" href="/statics/css/index.css">
 <body>
 {# 还原导航栏 #}
 <a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
@@ -96,7 +97,7 @@
 <script>
     function sum(arr) {
         return eval(arr.join("+"));
-    };
+    }
 
     var ord =
     {{ ordata|safe }}
@@ -120,6 +121,10 @@
             btn: ['确定', '取消'],
             yes: function () {
                 pieDrawCharts_createElement()
+                for (let i = 0; i < arrayObj.length; i++) {
+                    createrPieCharts(i)
+                    drawCharts_drawN_D(i, arrayObj[i])
+                }
                 ChangeDisabled(xname[1])// 设置禁用
                 if (xname[1] === "day_id"){
                     for (let i = 0;i < xord.length;i++){
@@ -132,10 +137,6 @@
                 }
                 addItem(xord, "X")// 添加项
                 addItem(yname, "Y")// 添加项
-                for (let i = 0; i < arrayObj.length; i++) {
-                    createrPieCharts(i)
-                    drawCharts_drawN_D(i, arrayObj[i])
-                }
                 $(".layui-layer-close1").trigger('click');
             }
         })
@@ -268,6 +269,22 @@
             tooltip: {
                 trigger: 'item',
             },
+            toolbox:{
+                show: true,
+                feature: {
+                    dataView: {
+                        title: '数据视图',
+                        lang: ['数据视图', '退出', '刷新'],
+                        readOnly: false
+                    },
+                    restore: {
+                        title: '刷新'
+                    },
+                    saveAsImage: {
+                        title: '导出'
+                    }
+                }
+            },
             legend: {
                 data: xord,
                 x: 'left',      //可设定图例在左、右、居中
@@ -280,6 +297,7 @@
         }
         pieCharts.setOption(pieOption)
     }
+
     function pieDrawCharts_createElement() {
         for (let i = 0; i < ord.length; i++) {
             let value = YItemName[yname[i]]
@@ -298,7 +316,7 @@
             divChartsN_D.setAttribute('id', 'N_D' + i)
             divChartsN_D.setAttribute('style', 'width:400px;height:200px;')
             label.setAttribute('id', 'labelN_D' + i)
-            if (value != 10)
+            if (value !== '客座率')
                 label.innerHTML = "总和:" + sum(arrayObj[i]).toFixed(2) + "&emsp;&emsp;&emsp;平均值:" + average(arrayObj[i]).toFixed(2) + "<br>最大值:" + (Math.max.apply(null, arrayObj[i])).toFixed(2) + "&emsp;&emsp;&emsp;最小值:" + (Math.min.apply(null, arrayObj[i])).toFixed(2) + "<br>方差:" + varianceArr(arrayObj[i]) + "<br>标准差:" + stdDeviation(arrayObj[i])
             else
                 label.innerHTML = "总和:" + sum(arrayObj[i]).toFixed(2) + "%" + "&emsp;&emsp;&emsp;平均值:" + average(arrayObj[i]).toFixed(2) + "%" + "<br>最大值:" + (Math.max.apply(null, arrayObj[i])).toFixed(2) + "%" + "&emsp;&emsp;&emsp;最小值:" + (Math.min.apply(null, arrayObj[i])).toFixed(2) + "%" + "<br>方差:" + varianceArr(arrayObj[i]) + "%" + "<br>标准差:" + stdDeviation(arrayObj[i]) + "%"
@@ -313,7 +331,8 @@
             WorkBody.append(div2)
         }
     }
-    function drawCharts_two(XName, XAllData, i, j) {
+
+    function drawCharts_two(XName, i, j) {
         var formatterY = '{value}'
         try {
             if (GetY_ChooseItem[j].name == "客座率")
@@ -324,10 +343,10 @@
         }
 
         var BarCharts1 = echarts.init(document.getElementById('charts' + i), 'westeros')
-        var seriess = []
+        var series = []
         if (GetX_ChooseItem.length == 10) {
             for (let k = 0; k < datas[i].length / 10; k++) {
-                seriess.push(
+                series.push(
                     {
                         name: YItemName[j],
                         type: 'pie',
@@ -369,7 +388,7 @@
             }
         } else {
             for (let k = 0; k < datas[i].length / 20; k++) {
-                seriess.push(
+                series.push(
                     {
                         name: YItemName[j],
                         type: 'pie',
@@ -472,7 +491,7 @@
                 padding: [50, 50, 0, 10],   //可设定图例[距上方距离，距右方距离，距下方距离，距左方距离]
             },
             calculable: true,
-            series: seriess
+            series: series
         };
         BarCharts1.setOption(option)
     }

@@ -158,7 +158,9 @@ function drawCharts_Draw() {
             Ydatas.push(GetResponseData[i].data[j])
         }
     }
+    console.log('5555')
     if (GetY_ChooseItem.length == 0) {//Y轴未选
+        values = []
         for (let i = 0; i < 11; i++) {
             var arrs = 'arr' + i
             arrs = new Array()
@@ -193,11 +195,13 @@ function drawCharts_Draw() {
             drawCharts_one(11)
         }
     } else {
+        values = []
         for (let i = 0; i < GetY_ChooseItem.length; i++) {
             var arrs = 'arr' + i
             arrs = new Array()
             value = GetY_ChooseItem[i].value;
             values.push(value)
+            console.log(values)
             for (let i = 0; i < Ydatas.length; i++) {
                 //求客坐率,坐公里 ，客公里
                 if (value == 8 || value == 9 || value == 10) {
@@ -424,9 +428,10 @@ function drawCharts_drawN_D(i, data) {
 
 //画第一步
 function drawCharts_one(length) {
+    console.log(length)
     for (let i = 0; i < length; i++) {
         try {
-            if (GetY_ChooseItem[i].name != "客座率") {
+            if (GetY_ChooseItem[i].name !== "客座率") {
                 drawCharts_drawN_D(i, datas[i])
                 drawCharts_two(XName, i, GetY_ChooseItem[i].value)
             } else {
@@ -434,7 +439,7 @@ function drawCharts_one(length) {
                 drawCharts_two(XName, i, GetY_ChooseItem[i].value)
             }
         } catch (e) {
-            if (length != 11){
+            if (length !== 11){
                 drawCharts_drawN_D(i, datas[i])
                 drawCharts_two(XName, i, i)
             } else{

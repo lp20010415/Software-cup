@@ -48,7 +48,7 @@ def getData(request):
 
 
 # 上传文件
-def UploadFile(request):
+def uploadfile(request):
     if request.method == 'POST':
         successFile = []
         getFiles = request.FILES.getlist('file')
@@ -68,7 +68,7 @@ def UploadFile(request):
                         for col in row:
                             getValues += f"'{col}'" + ','
                         getValues = getValues.rstrip(',')
-                    cursor.execute(f'insert into uploaddata values({getValues})')
+                        cursor.execute(f'insert into uploaddata values({getValues})')
                 file.close()
                 successFile.append(f.name)
             elif f.name.split('.')[-1] == 'xlsx':  # 上传xlsx文件
@@ -76,6 +76,7 @@ def UploadFile(request):
                 for chunk in f.chunks():
                     file.write(chunk)
                 file.close()
+                file = open(fileURL)
                 wb = xlrd.open_workbook(f.name)
                 sh = wb.sheet_by_name('Sheet1')
                 # 解析数据-纠正格式
@@ -95,6 +96,7 @@ def UploadFile(request):
                             value += f"'{cell}'" + ','
                     value = value.rstrip(',')
                     cursor.execute(f'insert into uploaddata values({value})')
+                file.close()
                 successFile.append(f.name)
             os.remove(fileURL)
         return HttpResponse(json.dumps(successFile), content_type='application/json')
@@ -137,9 +139,7 @@ def drawTable(request):
             data = simplify(row)
         elif re.match('search', order):
             if re.match('desc|asc', order.split('-')[-1]):
-                print('来了')
                 order = order.split('-')[-1]
-                print(order)
                 cursor.execute(f'select * from temporary_search_table order by {field} {order}')
                 row = cursor.fetchall()
                 data = simplify(row)

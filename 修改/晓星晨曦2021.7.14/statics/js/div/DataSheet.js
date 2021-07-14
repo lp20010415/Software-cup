@@ -20,6 +20,7 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
 
     //从数据库获取数据
     function GetData(num){
+        checkSearch = false
         var data = {
             'order': '0',
             'num': num * 100,
@@ -85,7 +86,7 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
     table.on('sort(DataSheet)', function (obj) {
         console.log(obj)
         var content = document.getElementById('searchInput').value
-        if(content == "" && getSearchSelect == ""){
+        if(content === "" && getSearchSelect === undefined){
             checkSearch = false
         }
         if(!checkSearch){
@@ -98,14 +99,26 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
                 }
             })
         }else{
-            table.reload('DataSheet', {
-                initSort: obj,
-                url: '/drawTable/',
-                where: {
-                    field: obj.field,
-                    order: 'search-' + obj.type,
-                }
-            })
+            if (/null/.test(obj.type)){
+                table.reload('DataSheet', {
+                    initSort: obj,
+                    url: '/drawTable/',
+                    where: {
+                        field: getSearchSelect,
+                        content: content,
+                        order: "search"
+                    }
+                })
+            } else {
+                table.reload('DataSheet', {
+                    initSort: obj,
+                    url: '/drawTable/',
+                    where: {
+                        field: obj.field,
+                        order: 'search-' + obj.type,
+                    }
+                })
+            }
         }
     })
 
@@ -117,8 +130,7 @@ document.write("<script language='JavaScript' src='/statics/js/jquery.cookie.js'
     //搜索
     function search() {
         var content = document.getElementById('searchInput').value
-        if(getSearchSelect != "" && content != ""){
-            console.log(getSearchSelect)
+        if(getSearchSelect !== undefined && content !== ""){
             checkSearch = true
             table.reload('DataSheet', {
                 url: '/drawTable/',

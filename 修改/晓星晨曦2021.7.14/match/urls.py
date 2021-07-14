@@ -29,7 +29,7 @@ urlpatterns = [
     path('ScatterCharts/', html.ScatterCharts),
     path("indexApi/", html.indexApi),
     path('GetData/', Action.getData),
-    path('UploadFile/', Action.UploadFile),
+    path('uploadfile/', Action.uploadfile),
     path('drawTable/', Action.drawTable),
     path('drawCharts/', Action.drawCharts),
 ]

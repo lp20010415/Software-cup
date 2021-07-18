@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析-折线图</title>
+    <link rel="shortcut icon" href="/statics/images/Line_chart.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+    <link rel="stylesheet" href="/statics/css/index.css">
+</head>
+<body>
+{# 还原导航栏 #}
+<a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+   onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">
+    点击还原导航栏
+</a>
+
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="/BarCharts/" class="GoUrl">柱状图</a></dd>
+                <dd><a href="/LineCharts/" class="GoUrl">折线图</a></dd>
+                <dd><a href="/ScatterCharts/" class="GoUrl">散点图</a></dd>
+                <dd><a href="/PieCharts/" class="GoUrl">饼图</a></dd>
+                <dd><a href="/AreaCharts/" class="GoUrl">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="layui-body" id="WorkBody">
+    <fieldset style="text-align: center;border-bottom: none;font-size: 20px;">
+        <legend><b>每次有60条数据</b></legend>
+    </fieldset>
+    <div class="MainItem">
+        <fieldset>
+            <legend style="font-size: 16px;">
+                <b>X轴、Y轴、显示数据选择{#<a style="text-decoration: underline;color:red">三者说明</a>#}</b></legend>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;" id="XText">10或20项(已项0项)</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">X轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="X_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <input class="layui-input" type="text" id="day_id">
+                        <select id="X_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem">
+            <legend style="font-size: 12px;" id="YText">默认全选</legend>
+            <div class="layui-form ">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Y轴:</label>
+                    <div class="layui-inline" style="text-align: start">
+                        <div id="Y_Location"></div>
+                    </div>
+                    <div class="layui-inline layui-hide">
+                        <select id="Y_SelectItem"></select>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="drawCharts_GetData()">确定</button>
+        </fieldset>
+        <fieldset class="ChooseItem" style="border: 0">
+            <button class="layui-btn" onclick="cancel()">取消</button>
+        </fieldset>
+    </div>
+</div>
+
+</body>
+<script src="/statics/plugins/Echarts/echarts.js"></script>
+<script src="/statics/js/EchartsStyle.js"></script>
+<script src="/statics/js/jquery-3.6.0.min.js"></script>
+<script src="/statics/js/jquery.cookie.js"></script>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/plugins/layui/xm-select.js"></script>
+<script src="/statics/js/div/index.js"></script>
+<script>
+    var ord = {{ ordata|safe }}
+    var xord = {{ xorData|safe }}
+    var name= {{ name|safe }}
+        yname = name.split(",")
+    var xname = {{ xname|safe }}
+    var arrayObj = []
+</script>
+<script src="/statics/js/div/LineCharts.js"></script>
+</html>

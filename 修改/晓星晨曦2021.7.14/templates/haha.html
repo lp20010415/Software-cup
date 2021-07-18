@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="demo"></div>
+</body>
+<script src="../statics/js/jquery-3.6.0.min.js"></script>
+<script src="../statics/plugins/layui/layui.js"></script>
+<script src="../statics/plugins/layui/xm-select.js"></script>
+<script>
+    var demo = xmSelect.render({
+        el: '#demo',
+        model: { label: { type: 'text' } },
+        tree: {
+            show: true,
+            showFolderIcon: true,
+            showLine: true,
+            indent: 20,
+            strict: false,
+            simple: true,
+        },
+        data: [
+            {name: '销售员', value: -1, disabled: false, children: [
+				{name: '张三1', value: 1, selected: true, children: []},
+				{name: '李四1', value: 2, selected: true},
+				{name: '王五1', value: 3, disabled: true},
+			]},
+			{name: '奖品', value: -2, children: [
+				{name: '奖品3', value: -3, children: [
+					{name: '苹果3', value: 14, selected: true},
+					{name: '香蕉3', value: 15},
+					{name: '葡萄3', value: 16},
+				]},
+				{name: '苹果2', value: 4, selected: true, disabled: true},
+				{name: '香蕉2', value: 5},
+				{name: '葡萄2', value: 6},
+			]},
+        ],
+        on: function(data){
+            if(data.isAdd){
+                var test = document.getElementsByClassName('xm-option-icon xm-iconfont xm-icon-duox')
+                console.log(data)
+                return data.change.slice(0, 1)
+            }
+        },
+    })
+</script>
+</html>

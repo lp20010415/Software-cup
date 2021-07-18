@@ -1,0 +1,48 @@
+.layui-form-item {
+    margin-top: 2px;
+    margin-bottom: 0;
+}
+
+.layui-form-label {
+    font-weight: bold;
+    font-size: 16px;
+    width: auto;
+    text-align: left;
+    margin: 5px;
+}
+
+.MainItem {
+    top: 0;
+    border: 2px solid black;
+    width: auto;
+    height: auto;
+    margin-top: 1px;
+    margin-left: 2px;
+    text-align: center;
+}
+
+.ChooseItem {
+    display: inline-block;
+    border: 2px solid black;
+    font-weight: bold;
+}
+
+.layui-body {
+    position: absolute;
+}
+
+.ShowNav {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 6px;
+    position: absolute;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: 2px solid black;
+    border-top: 1px solid black;
+    font-size: 20px;
+}

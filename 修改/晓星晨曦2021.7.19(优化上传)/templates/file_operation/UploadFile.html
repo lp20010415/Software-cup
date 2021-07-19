@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>在线可视化数据分析(上传文件)</title>
+    <link rel="shortcut icon" href="/statics/images/Upload.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/statics/plugins/layui/css/layui.css">
+</head>
+<style type="text/css">
+    .layui-body {
+        position: absolute;
+    }
+
+    .layui-btn-lg{
+        height: 80px;
+        font-size: 32px;
+        margin: 10px;
+    }
+
+    .ShowNav {
+        font-size: 16px;
+        position: absolute;
+    }
+
+    .dropbox{
+        min-width:300px;
+        min-height:300px;
+        border:5px dashed black;
+        margin:10px;
+        background: #66CCFF;
+    }
+
+</style>
+<body>
+<div>
+    <a id="ShowNav" class="layui-icon layui-icon-spread-left ShowNav layui-hide"
+       onclick="ShowNav.className='layui-hide';Nav.className='layui-nav layui-nav-tree layui-nav-side layui-bg-green';WorkBody.className='layui-body'">点击还原导航栏</a>
+</div>
+<div style="display: inline">
+    <div class="layui-nav layui-nav-tree layui-nav-side layui-bg-green" id="Nav">
+        <div class="layui-nav-item layui-this">
+            <a href="javascript:"
+               onclick="ShowNav.className='layui-icon layui-icon-spread-left ShowNav';Nav.className='layui-hide';WorkBody.className=''">隐藏导航栏</a>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">文件</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/UploadFile/">文件上传</a></dd>
+            </dl>
+        </div>
+        <div class="layui-nav-item">
+            <a href="javascript:">图表展现</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/DataSheet/">数据表</a></dd>
+                <dd><a href="/BarCharts/">柱状图</a></dd>
+                <dd><a href="/LineCharts/">折线图</a></dd>
+                <dd><a href="/ScatterCharts/">散点图</a></dd>
+                <dd><a href="/PieCharts/">饼图</a></dd>
+                <dd><a href="/AreaCharts/">面积图</a></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<input style="display: none;" type="file" id="HandFile" multiple="multiple" accept=".csv,.xlsx">
+<div class="layui-body" id="WorkBody">
+    <div class="dropbox" id="dropbox">
+        <div id="UploadText" style="text-align: center">
+            <b id="showText" style="font-size:50px;">
+                拖文件到此或单击此处准备上传文件(支持csv/xlsx文件)<br>支持多文件上传，但只会上传格式正确的文件格式
+            </b>
+        </div>
+        <div class="layui-hide" id="UploadProgress" style="text-align: center;width: 500px;">
+            <label id="UploadingText" style="font-size:50px;">上&emsp;传&emsp;中&emsp;:</label>
+            <div class="layui-progress layui-progress-big" lay-showPercent="true" lay-filter="Uploading">
+                <div class="layui-progress-bar layui-bg-green" lay-percent=""></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button id="UploadBtn" type="button" class="layui-btn layui-btn-lg layui-btn-normal layui-btn-disabled">开始上传</button>
+        <button id="UploadCancel" type="button" class="layui-btn layui-btn-lg layui-btn-warm" style="float: right" onclick="refresh()">取消</button>
+    </div>
+</div>
+</body>
+<script src="/statics/plugins/layui/layui.js"></script>
+<script src="/statics/js/div/UploadFile.js"></script>
+</html>
